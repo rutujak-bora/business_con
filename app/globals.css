@@ -1,0 +1,383 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --background: 30 15% 3%;
+  --foreground: 40 20% 95%;
+  --card: 30 10% 6%;
+  --card-foreground: 40 20% 95%;
+  --popover: 30 10% 6%;
+  --popover-foreground: 40 20% 95%;
+  --primary: 35 30% 85%;
+  --primary-foreground: 30 15% 5%;
+  --secondary: 30 10% 12%;
+  --secondary-foreground: 40 20% 95%;
+  --muted: 30 10% 12%;
+  --muted-foreground: 30 10% 55%;
+  --accent: 35 40% 75%;
+  --accent-foreground: 30 15% 5%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 40 20% 95%;
+  --border: 30 10% 18%;
+  --input: 30 10% 12%;
+  --ring: 35 30% 75%;
+  --radius: 0.5rem;
+  --hop-cream: 40 33% 96%;
+  --hop-gold: 35 50% 70%;
+  --hop-bronze: 30 40% 45%;
+  --hop-charcoal: 30 10% 8%;
+  --hop-black: 30 15% 3%;
+}
+
+/* ─── Custom Cursor ─── */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: #c9a86c;
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  transition: width 0.2s, height 0.2s;
+  will-change: transform;
+}
+
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(201, 168, 108, 0.5);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  will-change: transform;
+}
+
+.cursor-ring.cursor-hover {
+  width: 60px;
+  height: 60px;
+  border-color: rgba(201, 168, 108, 0.9);
+  background: rgba(201, 168, 108, 0.05);
+}
+
+/* ─── Scroll Progress Bar ─── */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #c9a86c, #f5f0e8, #b8956d);
+  z-index: 9999;
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+.font-serif {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Enhanced Glassmorphism ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-premium {
+  background: linear-gradient(135deg, rgba(201, 168, 108, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(201, 168, 108, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(201, 168, 108, 0.1);
+}
+
+/* ─── Gradient Text ─── */
+.gradient-text {
+  background: linear-gradient(135deg, #f5f0e8 0%, #c9a86c 40%, #b8956d 70%, #e8dcc8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cream-text {
+  background: linear-gradient(135deg, #faf7f2 0%, #e8dcc8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Animated Background ─── */
+.animated-gradient {
+  background: linear-gradient(-45deg, #0a0908, #151210, #1a1614, #0f0d0c);
+  background-size: 400% 400%;
+  animation: gradient 20s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ─── Particle Canvas ─── */
+.particle-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Glow Effects ─── */
+.glow {
+  box-shadow: 0 0 60px rgba(201, 168, 108, 0.08);
+}
+
+.glow-gold {
+  box-shadow: 0 0 40px rgba(201, 168, 108, 0.15);
+}
+
+/* ─── Line Hover Animation ─── */
+.line-animation::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #c9a86c, #e8dcc8);
+  transition: width 0.4s ease;
+}
+
+.line-animation:hover::after {
+  width: 100%;
+}
+
+/* ─── 3D Perspective ─── */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* ─── Floating WhatsApp Button ─── */
+@keyframes whatsapp-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.45);
+  }
+
+  50% {
+    box-shadow: 0 4px 45px rgba(37, 211, 102, 0.75);
+  }
+}
+
+.whatsapp-float {
+  animation: whatsapp-pulse 2.5s ease-in-out infinite;
+}
+
+/* ─── Sticky Mobile CTA ─── */
+.mobile-sticky-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9980;
+  padding: 12px 16px;
+  background: rgba(10, 9, 8, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(201, 168, 108, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+@media (min-width: 1024px) {
+  .mobile-sticky-cta {
+    display: none;
+  }
+}
+
+/* ─── Skeleton Shimmer ─── */
+.skeleton {
+  background: linear-gradient(90deg,
+      rgba(201, 168, 108, 0.04) 0%,
+      rgba(201, 168, 108, 0.1) 50%,
+      rgba(201, 168, 108, 0.04) 100%);
+  background-size: 200%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ─── Numbers Banner ─── */
+.numbers-banner {
+  background: linear-gradient(135deg, rgba(201, 168, 108, 0.07) 0%, rgba(10, 9, 8, 0.85) 50%, rgba(201, 168, 108, 0.07) 100%);
+  border-top: 1px solid rgba(201, 168, 108, 0.18);
+  border-bottom: 1px solid rgba(201, 168, 108, 0.18);
+}
+
+/* ─── Timeline ─── */
+.timeline-connector {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(201, 168, 108, 0.3) 20%, rgba(201, 168, 108, 0.3) 80%, transparent);
+  pointer-events: none;
+}
+
+/* ─── Blog / Insight Cards ─── */
+.insight-card-hover {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.insight-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(201, 168, 108, 0.1);
+}
+
+/* ─── Instagram Grid ─── */
+.instagram-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+}
+
+.instagram-item {
+  aspect-ratio: 1;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.instagram-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(201, 168, 108, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.instagram-item:hover .instagram-overlay {
+  opacity: 1;
+}
+
+/* ─── Floating orb ─── */
+@keyframes float-orb {
+
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.35;
+  }
+
+  33% {
+    transform: translateY(-22px) translateX(12px);
+    opacity: 0.55;
+  }
+
+  66% {
+    transform: translateY(-12px) translateX(-16px);
+    opacity: 0.45;
+  }
+}
+
+/* ─── Floral Decoration ─── */
+.floral-decoration::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23c9a86c' stroke-width='0.5' opacity='0.3'%3E%3Cpath d='M50 10 Q60 30 50 50 Q40 30 50 10'/%3E%3Cpath d='M50 50 Q60 70 50 90 Q40 70 50 50'/%3E%3Cpath d='M10 50 Q30 60 50 50 Q30 40 10 50'/%3E%3Cpath d='M50 50 Q70 60 90 50 Q70 40 50 50'/%3E%3Ccircle cx='50' cy='50' r='5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  opacity: 0.2;
+}
+
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(30 15% 4%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 108, 0.28);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 168, 108, 0.5);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
