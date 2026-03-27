@@ -47,7 +47,7 @@ import {
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_strategy-hub-121/artifacts/4s9xy1pp_image.png"
 
 // ─── 1. Custom Gold Cursor + Sound ───
-function CustomCursor() {
+function CustomCursor({ muted }) {
   const dotRef = useRef(null)
   const ringRef = useRef(null)
   const pos = useRef({ x: 0, y: 0 })
@@ -56,10 +56,9 @@ function CustomCursor() {
   const rafRef = useRef(null)
   const audioCtxRef = useRef(null)
   const lastSoundTime = useRef(0)
-  const [muted, setMuted] = useState(false)
   const mutedRef = useRef(false)
 
-  // Keep mutedRef in sync with state
+  // Keep mutedRef in sync with prop
   useEffect(() => { mutedRef.current = muted }, [muted])
 
   // ── Web Audio helpers ──────────────────────────────────
@@ -190,22 +189,12 @@ function CustomCursor() {
     <>
       <div ref={dotRef} className="cursor-dot" />
       <div ref={ringRef} className="cursor-ring" />
-      {/* Cursor Sound Mute Toggle — sits above music button */}
-      <button
-        onClick={() => setMuted(m => !m)}
-        title={muted ? 'Unmute cursor sounds' : 'Mute cursor sounds'}
-        style={{ cursor: 'none' }}
-        className="fixed bottom-[108px] left-6 z-[99990] w-9 h-9 flex items-center justify-center border border-[#c9a86c]/20 bg-[#0a0908]/80 backdrop-blur-sm text-[#c9a86c]/60 hover:text-[#c9a86c] hover:border-[#c9a86c]/40 transition-all duration-300 text-[10px]"
-        title={muted ? 'Unmute clicks' : 'Mute clicks'}
-      >
-        {muted ? '🔇' : '🖱️'}
-      </button>
     </>
   )
 }
 
 // ─── Background Ambient Music (Web Audio API — no files needed) ───
-function BackgroundMusic() {
+function BackgroundMusic({ cursorMuted, setCursorMuted }) {
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.18)
   const [showVolume, setShowVolume] = useState(false)
@@ -373,16 +362,15 @@ function BackgroundMusic() {
   }, [])
 
   return (
-    <div className="fixed bottom-6 left-6 z-[99985] flex flex-col items-start gap-2">
+    <div className="fixed bottom-[90px] md:bottom-10 left-6 z-[99985] flex flex-row items-end gap-2 md:gap-3">
       {/* Volume Slider (shown on hover) */}
       <AnimatePresence>
         {showVolume && (
           <motion.div
-            initial={{ opacity: 0, y: 10, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: 10, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="flex flex-col items-center gap-1 glass-premium border border-[#c9a86c]/15 p-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 h-[100px] flex flex-col items-center gap-1 glass-premium border border-[#c9a86c]/15 p-3"
           >
             <span className="text-[#c9a86c]/40 text-[9px] tracking-widest uppercase mb-1">Vol</span>
             <input
@@ -405,12 +393,11 @@ function BackgroundMusic() {
         )}
       </AnimatePresence>
 
-      {/* Main music button */}
-      <div className="relative">
-        {/* Pulse ring when playing */}
+      {/* ─── Music Controls (Ambient) ─── */}
+      <div className="relative group">
         {playing && (
           <motion.div
-            animate={{ scale: [1, 1.6, 1], opacity: [0.4, 0, 0.4] }}
+            animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute inset-0 rounded-full border border-[#c9a86c]/30"
             style={{ pointerEvents: 'none' }}
@@ -422,34 +409,45 @@ function BackgroundMusic() {
           onMouseLeave={() => setShowVolume(false)}
           style={{ cursor: 'none' }}
           title={playing ? 'Pause music' : 'Play ambient music'}
-          className={`relative w-11 h-11 flex flex-col items-center justify-center gap-[3px] border transition-all duration-500 backdrop-blur-sm ${
+          className={`relative w-9 h-9 md:w-11 md:h-11 flex flex-col items-center justify-center border transition-all duration-500 backdrop-blur-sm ${
             playing
               ? 'border-[#c9a86c]/60 bg-[#c9a86c]/10 text-[#c9a86c]'
               : 'border-[#c9a86c]/20 bg-[#0a0908]/80 text-[#c9a86c]/50 hover:border-[#c9a86c]/40 hover:text-[#c9a86c]/80'
           }`}
         >
-          {/* Animated equalizer bars when playing, play icon when paused */}
           {playing ? (
-            <div className="flex items-end gap-[2px] h-4">
+            <div className="flex items-end gap-[1.5px] h-3 md:h-4">
               {[1, 1.8, 1.2, 2, 0.8].map((h, i) => (
                 <motion.div
                   key={i}
                   animate={{ scaleY: [1, h, 0.5, h, 1] }}
                   transition={{ duration: 0.8 + i * 0.15, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-[2px] bg-[#c9a86c] origin-bottom"
-                  style={{ height: '12px' }}
+                  className="w-[1.5px] md:w-[2px] bg-[#c9a86c] origin-bottom"
+                  style={{ height: '10px' }}
                 />
               ))}
             </div>
           ) : (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="currentColor">
               <path d="M3 2l10 5-10 5V2z" />
             </svg>
           )}
         </button>
       </div>
 
-      {/* Cursor sound mute — stacked below */}
+      {/* ─── Cursor Sound Toggle (Integrated) ─── */}
+      <button
+        onClick={() => setCursorMuted(m => !m)}
+        title={cursorMuted ? 'Unmute cursor' : 'Mute cursor'}
+        style={{ cursor: 'none' }}
+        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center border backdrop-blur-sm transition-all duration-500 ${
+          !cursorMuted 
+            ? 'border-[#c9a86c]/40 bg-[#c9a86c]/5 text-[#c9a86c]'
+            : 'border-[#c9a86c]/20 bg-[#0a0908]/80 text-[#c9a86c]/40 hover:border-[#c9a86c]/40'
+        }`}
+      >
+        <span className="text-[12px] md:text-[14px]">{cursorMuted ? '🔇' : '🖱️'}</span>
+      </button>
     </div>
   )
 }
@@ -2491,6 +2489,7 @@ function Footer() {
 export default function App() {
   const [showIntro, setShowIntro] = useState(true)
   const [contentReady, setContentReady] = useState(false)
+  const [cursorMuted, setCursorMuted] = useState(false)
 
   useEffect(() => {
     const introShown = sessionStorage.getItem('hopIntroShown')
@@ -2509,10 +2508,10 @@ export default function App() {
   return (
     <main className="min-h-screen bg-[#0a0908]" style={{ cursor: 'none' }}>
       {/* Global UX Overlays */}
-      <CustomCursor />
+      <CustomCursor muted={cursorMuted} />
       <ScrollProgressBar />
       <ParticleCanvas />
-      <BackgroundMusic />
+      <BackgroundMusic cursorMuted={cursorMuted} setCursorMuted={setCursorMuted} />
       <WhatsAppButton />
       <MobileStickyCTA />
 
