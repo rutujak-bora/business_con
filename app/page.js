@@ -1753,14 +1753,19 @@ function CaseStudiesSection() {
                         ))}
                       </div>
                       
-                      <Button 
-                        onClick={() => setSelectedCase(caseStudy)}
-                        variant="outline" 
-                        className="border-[#c9a86c]/30 text-[#c9a86c] hover:bg-[#c9a86c]/10 rounded-none w-fit group/btn text-xs tracking-wider uppercase"
-                      >
-                        View Full Story
-                        <ArrowUpRight className="ml-2 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" size={14} />
-                      </Button>
+                      <div className="relative z-[30]">
+                        <Button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedCase(caseStudy);
+                          }}
+                          variant="outline" 
+                          className="border-[#c9a86c]/30 text-[#c9a86c] hover:bg-[#c9a86c]/20 hover:border-[#c9a86c] rounded-none w-fit group/btn text-xs tracking-wider uppercase pointer-events-auto"
+                        >
+                          View Full Story
+                          <ArrowUpRight className="ml-2 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" size={14} />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
