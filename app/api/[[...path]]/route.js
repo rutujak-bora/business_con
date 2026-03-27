@@ -3,11 +3,14 @@ import { MongoClient } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 
 // MongoDB connection
-const client = new MongoClient(process.env.MONGO_URL)
+const client = process.env.MONGO_URL ? new MongoClient(process.env.MONGO_URL) : null;
 let db = null
 
 async function getDb() {
   if (!db) {
+    if (!client) {
+      throw new Error('Please add your Mongo URI to .env');
+    }
     await client.connect()
     db = client.db(process.env.DB_NAME || 'business_consultant')
   }

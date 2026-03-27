@@ -1463,6 +1463,73 @@ function ServicesSection() {
       title: 'Offline Marketing',
       description: 'Because the real world still matters. We design and execute offline marketing strategies that create genuine human connection and lasting brand recall.',
       features: ['Event Activation', 'Print Media', 'Community Engagement', 'Physical Presence']
+    },
+    {
+      icon: MessageCircle,
+      title: 'Website/Social Media Management',
+      customContent: (
+        <div className="space-y-6 text-[#e8dcc8]/50 font-light mt-4">
+          <div>
+            <h4 className="text-[#c9a86c] text-lg mb-2 font-medium flex items-center gap-2">
+              Create your own website 
+              <span className="text-[10px] uppercase tracking-wider opacity-60 cursor-pointer hover:underline mb-0">View more</span>
+            </h4>
+            <p className="mb-3 text-sm">Your website is the first handshake your business makes. We make sure it leaves a lasting impression — beautifully designed, strategically built, and impossible to forget.</p>
+            <div className="bg-[#c9a86c]/5 border border-[#c9a86c]/20 p-4 mt-2 mb-4">
+              <p className="mb-2 italic text-[#f5f0e8] text-sm">Get your website custom made starting from 6999</p>
+              <button 
+                onClick={(e) => { e.stopPropagation(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }) }} 
+                className="text-xs tracking-wider text-[#c9a86c] hover:text-[#f5f0e8] uppercase underline underline-offset-4"
+              >
+                Book your free consultation
+              </button>
+            </div>
+          </div>
+          <div>
+            <h4 className="text-[#c9a86c] text-lg mb-2 font-medium">Social Media Management</h4>
+            <p className="text-sm">In a world that never stops scrolling, consistency is everything. We craft content, manage communities, and build social strategies that keep your brand at the top of every feed.</p>
+          </div>
+        </div>
+      )
+    },
+    {
+      icon: TrendingUp,
+      title: 'Elevated Marketing',
+      customContent: (
+        <div className="space-y-6 text-[#e8dcc8]/50 font-light mt-4">
+          <div>
+            <h4 className="text-[#c9a86c] text-lg mb-2 font-medium flex items-center gap-2">
+              Performance Marketing 
+              <span className="text-[10px] uppercase tracking-wider opacity-60 cursor-pointer hover:underline mb-0">View more</span>
+            </h4>
+            <p className="text-sm">Social media gets you the views and makes you visible but if you want those views to turn into leads, then choose performance marketing.</p>
+          </div>
+          <div>
+            <h4 className="text-[#c9a86c] text-lg mb-2 font-medium flex items-center gap-2">
+              Guerilla Marketing 
+              <span className="text-[10px] uppercase tracking-wider opacity-60 cursor-pointer hover:underline mb-0">View more</span>
+            </h4>
+            <p className="text-sm">The most effective way for customers to interact with your business and turn customers into lifelong advocates.</p>
+          </div>
+        </div>
+      )
+    },
+    {
+      icon: Award,
+      title: 'One step solution for your business',
+      fullWidth: true,
+      centered: true,
+      customContent: (
+        <div className="text-center space-y-4 py-6 mt-4 flex flex-col items-center">
+          <p className="text-xl md:text-2xl text-[#c9a86c] italic font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Right from registering your business</p>
+          <div className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"></div>
+          <p className="text-xl md:text-2xl text-[#f5f0e8] font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>To making your business grow</p>
+          <div className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"></div>
+          <p className="text-xl md:text-2xl text-[#c9a86c] italic font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>To execute all the plans</p>
+          <div className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"></div>
+          <p className="text-xl md:text-2xl text-[#f5f0e8] font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Turning your dreams into reality</p>
+        </div>
+      )
     }
   ]
 
@@ -1499,11 +1566,12 @@ function ServicesSection() {
               variants={fadeInUp}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
+              className={service.fullWidth ? "md:col-span-2 flex justify-center" : ""}
             >
-              <TiltCard className="h-full">
+              <TiltCard className={`h-full ${service.fullWidth ? 'w-full lg:w-3/4' : 'w-full'}`}>
                 <Card className="bg-transparent border-[#c9a86c]/10 hover:border-[#c9a86c]/30 transition-all duration-700 h-full overflow-hidden group">
                   <CardContent className="p-10">
-                    <div className="flex items-start gap-6">
+                    <div className={`flex ${service.centered ? 'flex-col items-center text-center' : 'items-start'} gap-6`}>
                       <motion.div
                         animate={{ rotate: hoveredIndex === index ? 360 : 0 }}
                         transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -1511,33 +1579,37 @@ function ServicesSection() {
                       >
                         <service.icon className="text-[#c9a86c]" size={28} />
                       </motion.div>
-                      <div className="flex-1">
+                      <div className={`flex-1 ${service.centered ? 'w-full flex flex-col items-center' : ''}`}>
                         <h3 className="text-2xl text-[#f5f0e8] mb-4 font-light group-hover:text-[#c9a86c] transition-colors duration-500" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                           {service.title}
                         </h3>
-                        <p className="text-[#e8dcc8]/50 mb-6 font-light">
-                          {service.description}
-                        </p>
-                        
-                        <AnimatePresence>
-                          {hoveredIndex === index && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.4 }}
-                            >
-                              <div className="grid grid-cols-2 gap-3 pt-6 border-t border-[#c9a86c]/10">
-                                {service.features.map((feature) => (
-                                  <div key={feature} className="flex items-center gap-2">
-                                    <div className="w-1 h-1 bg-[#c9a86c]"></div>
-                                    <span className="text-xs text-[#e8dcc8]/60 tracking-wide">{feature}</span>
+                        {service.customContent ? service.customContent : (
+                          <>
+                            <p className="text-[#e8dcc8]/50 mb-6 font-light">
+                              {service.description}
+                            </p>
+                            
+                            <AnimatePresence>
+                              {hoveredIndex === index && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: 'auto' }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  transition={{ duration: 0.4 }}
+                                >
+                                  <div className="grid grid-cols-2 gap-3 pt-6 border-t border-[#c9a86c]/10">
+                                    {service.features?.map((feature) => (
+                                      <div key={feature} className="flex items-center gap-2">
+                                        <div className="w-1 h-1 bg-[#c9a86c]"></div>
+                                        <span className="text-xs text-[#e8dcc8]/60 tracking-wide">{feature}</span>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </>
+                        )}
                       </div>
                     </div>
                   </CardContent>
