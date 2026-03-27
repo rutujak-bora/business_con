@@ -1321,12 +1321,14 @@ function AboutSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#c9a86c]/[0.02] to-transparent"></div>
       
       <div className="container mx-auto px-6">
-        <div ref={ref} className="grid lg:grid-cols-2 gap-20 items-center">
-          {/* Image Side with 3D effect */}
+        {/* PART 1: Introduction */}
+        <div ref={ref} className="grid lg:grid-cols-2 gap-20 items-center mb-32">
+          {/* Primary Image */}
           <motion.div
             initial={{ opacity: 0, x: -80 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
             className="relative"
           >
             <TiltCard>
@@ -1334,37 +1336,20 @@ function AboutSection() {
                 <img
                   src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800"
                   alt="House of Persis Consultant"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-transparent to-transparent opacity-60"></div>
-                
-                {/* Elegant frame */}
                 <div className="absolute inset-4 border border-[#c9a86c]/20 pointer-events-none"></div>
               </div>
             </TiltCard>
-            
-            {/* Floating badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="absolute -bottom-6 -right-6 bg-[#0a0908] border border-[#c9a86c]/30 p-6"
-            >
-              <div className="flex items-center gap-4">
-                <Crown className="text-[#c9a86c]" size={28} />
-                <div>
-                  <p className="text-2xl font-light text-[#f5f0e8]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</p>
-                  <p className="text-[#c9a86c]/60 text-xs tracking-wider uppercase">Global Consultants</p>
-                </div>
-              </div>
-            </motion.div>
           </motion.div>
 
-          {/* Content Side */}
+          {/* Content side 1 */}
           <motion.div
             initial={{ opacity: 0, x: 80 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
           >
             <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block">What we do at house of persis?</span>
             <h2 className="text-4xl md:text-5xl text-[#f5f0e8] mb-8 leading-tight font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
@@ -1381,14 +1366,19 @@ function AboutSection() {
               marketing, franchise expansion, and financial clarity - we handle the full spectrum of your 
               business transformation.
             </p>
+          </motion.div>
+        </div>
 
-            <div className="mb-12 p-6 border border-[#c9a86c]/20 bg-[#c9a86c]/5">
-                <span className="text-[#c9a86c] text-xs tracking-[0.2em] uppercase mb-3 block">Our Goal</span>
-                <p className="text-xl text-[#f5f0e8] font-light italic" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                    "Top 1% global consultants in the next 10 years"
-                </p>
-            </div>
-
+        {/* PART 2: Why Choose & Our Story with Second Image */}
+        <div className="grid lg:grid-cols-2 gap-20 items-start mb-32 border-t border-[#c9a86c]/5 pt-32">
+          {/* Content Side 2 (Why Choose & Our Story) */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="order-2 lg:order-1"
+          >
             <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block">Why choose house of persis?</span>
             <p className="text-[#e8dcc8]/60 text-lg mb-6 leading-relaxed font-light font-bold">
               Because good advice is common. A growth partner is rare.
@@ -1406,25 +1396,61 @@ function AboutSection() {
             <p className="text-[#e8dcc8]/50 mb-10 leading-relaxed">
               House of Persis was founded in 2025 with a single, unwavering belief - that every business, regardless of size or stage, deserves the kind of strategic guidance once reserved for the elite. We help businesses start from scratch, right from registration to turning it into a legacy that runs for generations. We don’t just advise - we walk the path of business with you as your growth partner. Our approach is unique. We combine years of knowledge, expertise and experience to fulfill your business expectations.
             </p>
+          </motion.div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-[#c9a86c]/10">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 0.6 + index * 0.1, duration: 0.5 }}
-                  className="text-center"
-                >
-                  <p className="text-3xl md:text-4xl text-[#c9a86c] mb-2 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                    <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-                  </p>
-                  <p className="text-[#e8dcc8]/40 text-[10px] tracking-wider uppercase">{stat.label}</p>
-                </motion.div>
-              ))}
+          {/* Secondary Visual Image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2 }}
+            className="order-1 lg:order-2"
+          >
+            <TiltCard>
+              <div className="relative aspect-[3/2] overflow-hidden grayscale brightness-75 hover:grayscale-0 hover:brightness-100 transition-all duration-1000">
+                <img
+                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
+                  alt="Premium Strategy Meeting"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-[#0a0908]/20 group-hover:bg-transparent transition-colors duration-700"></div>
+                <div className="absolute inset-0 border border-[#c9a86c]/10 m-3"></div>
+              </div>
+            </TiltCard>
+          </motion.div>
+        </div>
+
+        {/* PART 3: Conclusion with Our Goal & Badge */}
+        <div className="max-w-4xl mx-auto border-t border-[#c9a86c]/10 pt-32">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-20"
+          >
+            <div className="inline-block mb-12 p-10 border border-[#c9a86c]/20 bg-[#c9a86c]/5 relative group">
+                <div className="absolute -top-3 -left-3 w-6 h-6 border-t border-l border-[#c9a86c]"></div>
+                <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b border-r border-[#c9a86c]"></div>
+                
+                <span className="text-[#c9a86c] text-xs tracking-[0.4em] uppercase mb-6 block">Our Ultimate Goal</span>
+                <p className="text-3xl md:text-5xl text-[#f5f0e8] font-light italic mb-8" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                    "Top 1% global consultants in the next 10 years"
+                </p>
+
+                {/* Final seal of quality */}
+                <div className="flex flex-col items-center gap-4 mt-10">
+                  <div className="w-16 h-16 border border-[#c9a86c]/30 rounded-full flex items-center justify-center p-3">
+                    <Crown className="text-[#c9a86c]" size={32} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-light text-[#f5f0e8]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</p>
+                    <p className="text-[#c9a86c]/60 text-[10px] tracking-widest uppercase">Global Consultants</p>
+                  </div>
+                </div>
             </div>
           </motion.div>
+
         </div>
       </div>
     </section>
