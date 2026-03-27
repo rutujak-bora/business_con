@@ -1652,6 +1652,7 @@ function CaseStudiesSection() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
+  const [selectedCase, setSelectedCase] = useState(null)
   const cases = [
     {
       title: 'Company Registration & Start-up',
@@ -1659,7 +1660,8 @@ function CaseStudiesSection() {
       result: 'Legal Compliance',
       description: 'Navigating the legal intricacies to set your business on firm ground from day one.',
       image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
-      metrics: [{ label: 'Speed to Market', value: '3 Weeks' }, { label: 'Risk Protection', value: '100%' }]
+      metrics: [{ label: 'Speed to Market', value: '3 Weeks' }, { label: 'Risk Protection', value: '100%' }],
+      fullStory: "Starting a brand is more than just an idea; it’s a legal and structural commitment. For this legacy client, we navigated the entire registration process in just 3 weeks. From securing intellectual property rights to setting up a robust tax framework, we ensured they were protected from future liabilities. Our 'Foundation' module isn't just paperwork—it’s the architectural blueprint for a business that never collapses. We handle the complexity so you can focus on the vision."
     },
     {
       title: 'Franchise Expansion Model',
@@ -1667,7 +1669,8 @@ function CaseStudiesSection() {
       result: 'Scalable Growth',
       description: 'Developing battle-tested franchise modules to expand your presence across the nation.',
       image: 'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&q=80&w=800',
-      metrics: [{ label: 'Potential Locations', value: '50+' }, { label: 'Revenue/Unit', value: '+35%' }]
+      metrics: [{ label: 'Potential Locations', value: '50+' }, { label: 'Revenue/Unit', value: '+35%' }],
+      fullStory: "Scaling a business requires a repeatable, profitable formula. We developed a comprehensive Franchise expansion module that standardized operations, branding, and customer experience. By optimizing unit economics, we increased individual outlet revenue by 35% while mapping out a roadmap for 50+ locations nationwide. We turn local success stories into national legacies through rigorous systems and unwavering brand standards."
     },
     {
       title: 'Financial Management Fix',
@@ -1675,7 +1678,8 @@ function CaseStudiesSection() {
       result: 'Precision Insight',
       description: "Bringing clarity to your numbers so decisions are grounded in insight, not just instinct.",
       image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800',
-      metrics: [{ label: 'Profit Growth', value: '2x' }, { label: 'Customer Satt.', value: '94%' }]
+      metrics: [{ label: 'Profit Growth', value: '2x' }, { label: 'Customer Satt.', value: '94%' }],
+      fullStory: "Clarity is the ultimate competitive advantage. Many businesses grow based on instinct, which eventually leads to stagnation. We implemented a data-driven financial management system that analyzed cash flow, overheads, and profit margins with surgical precision. We identified hidden 'leaks' that were draining resources and redirected them toward high-ROI initiatives. The result was a 100% (2x) profit growth within 12 months, achieved through clarity and calculated strategy."
     }
   ]
 
@@ -1749,7 +1753,11 @@ function CaseStudiesSection() {
                         ))}
                       </div>
                       
-                      <Button variant="outline" className="border-[#c9a86c]/30 text-[#c9a86c] hover:bg-[#c9a86c]/10 rounded-none w-fit group/btn text-xs tracking-wider uppercase">
+                      <Button 
+                        onClick={() => setSelectedCase(caseStudy)}
+                        variant="outline" 
+                        className="border-[#c9a86c]/30 text-[#c9a86c] hover:bg-[#c9a86c]/10 rounded-none w-fit group/btn text-xs tracking-wider uppercase"
+                      >
                         View Full Story
                         <ArrowUpRight className="ml-2 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" size={14} />
                       </Button>
@@ -1761,6 +1769,122 @@ function CaseStudiesSection() {
           ))}
         </motion.div>
       </div>
+
+      {/* Full Story Modal / Overlay */}
+      <AnimatePresence>
+        {selectedCase && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-6 md:p-12 lg:p-24"
+            style={{ cursor: 'none' }}
+          >
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-[#0a0908]/95 backdrop-blur-xl"
+              onClick={() => setSelectedCase(null)}
+            />
+            
+            <motion.div
+              layoutId={`case-${selectedCase.title}`}
+              className="relative w-full max-w-5xl bg-[#0a0908] border border-[#c9a86c]/20 shadow-2xl overflow-hidden flex flex-col lg:flex-row h-full max-h-[85vh] lg:h-auto"
+            >
+              <button 
+                onClick={() => setSelectedCase(null)}
+                className="absolute top-6 right-6 z-10 w-10 h-10 border border-[#c9a86c]/20 flex items-center justify-center text-[#c9a86c] hover:bg-[#c9a86c]/10 transition-all"
+              >
+                <X size={20} />
+              </button>
+
+              {/* Image Side */}
+              <div className="lg:w-1/2 relative h-64 lg:h-auto overflow-hidden">
+                <img 
+                  src={selectedCase.image} 
+                  alt={selectedCase.title}
+                  className="w-full h-full object-cover grayscale active-glow"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-transparent to-transparent" />
+              </div>
+
+              {/* Content Side */}
+              <div className="lg:w-1/2 p-10 md:p-14 overflow-y-auto bg-gradient-to-br from-[#0a0908] to-[#151210]">
+                <motion.span 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-4 block"
+                >
+                  Legacy | {selectedCase.category}
+                </motion.span>
+                
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl md:text-5xl text-[#f5f0e8] mb-8 font-light leading-tight" 
+                  style={{ fontFamily: 'Cormorant Garamond, serif' }}
+                >
+                  {selectedCase.title}
+                </motion.h2>
+
+                <motion.div 
+                   initial={{ opacity: 0, scaleX: 0 }}
+                   animate={{ opacity: 1, scaleX: 1 }}
+                   transition={{ delay: 0.4, duration: 0.6 }}
+                   className="w-16 h-px bg-[#c9a86c] mb-8 origin-left"
+                />
+
+                <motion.p 
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-[#f5f0e8] text-xl mb-10 font-light italic"
+                  style={{ fontFamily: 'Cormorant Garamond, serif' }}
+                >
+                  {selectedCase.result}
+                </motion.p>
+
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="space-y-6"
+                >
+                  <p className="text-[#e8dcc8]/70 leading-relaxed font-light text-lg">
+                    {selectedCase.fullStory}
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-8 pt-10 border-t border-[#c9a86c]/10">
+                    {selectedCase.metrics.map((metric, i) => (
+                      <div key={i}>
+                        <p className="text-3xl text-[#c9a86c] font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{metric.value}</p>
+                        <p className="text-[#e8dcc8]/40 text-[10px] tracking-widest uppercase">{metric.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="mt-12"
+                >
+                  <Button 
+                    onClick={() => setSelectedCase(null)}
+                    className="bg-[#c9a86c] hover:bg-[#b8956d] text-[#0a0908] rounded-none px-8 py-6 h-auto tracking-[0.2em] uppercase text-xs"
+                  >
+                    Close Story
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }

@@ -119,7 +119,7 @@ export async function POST(request, { params }) {
       }
 
       const database = await getDb()
-      
+
       // Check if already subscribed
       const existing = await database.collection('newsletter').findOne({ email })
       if (existing) {
@@ -175,7 +175,7 @@ export async function POST(request, { params }) {
         category: category || 'General',
         excerpt: excerpt || content.substring(0, 150) + '...',
         content,
-        author: author || 'Alexander Reed',
+        author: author || 'House of Parise Reed',
         readTime: `${Math.ceil(content.split(' ').length / 200)} min read`,
         createdAt: new Date().toISOString(),
         publishedAt: new Date().toISOString()
@@ -237,11 +237,11 @@ export async function PUT(request, { params }) {
         { id },
         { $set: { ...body, updatedAt: new Date().toISOString() } }
       )
-      
+
       if (result.matchedCount === 0) {
         return jsonResponse({ error: 'Contact not found' }, 404)
       }
-      
+
       return jsonResponse({ success: true, message: 'Contact updated' })
     }
 
@@ -251,11 +251,11 @@ export async function PUT(request, { params }) {
         { id },
         { $set: { ...body, updatedAt: new Date().toISOString() } }
       )
-      
+
       if (result.matchedCount === 0) {
         return jsonResponse({ error: 'Case study not found' }, 404)
       }
-      
+
       return jsonResponse({ success: true, message: 'Case study updated' })
     }
 
@@ -265,11 +265,11 @@ export async function PUT(request, { params }) {
         { id },
         { $set: { ...body, updatedAt: new Date().toISOString() } }
       )
-      
+
       if (result.matchedCount === 0) {
         return jsonResponse({ error: 'Article not found' }, 404)
       }
-      
+
       return jsonResponse({ success: true, message: 'Article updated' })
     }
 
@@ -279,11 +279,11 @@ export async function PUT(request, { params }) {
         { id },
         { $set: { ...body, updatedAt: new Date().toISOString() } }
       )
-      
+
       if (result.matchedCount === 0) {
         return jsonResponse({ error: 'Consultation not found' }, 404)
       }
-      
+
       return jsonResponse({ success: true, message: 'Consultation updated' })
     }
 

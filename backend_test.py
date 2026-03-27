@@ -40,7 +40,7 @@ TEST_ARTICLE = {
     "category": "Strategy",
     "excerpt": "Exploring emerging trends in business strategy...",
     "content": "In today's rapidly evolving business landscape, organizations must adapt their strategies to remain competitive. This comprehensive guide explores the key trends that will shape business strategy in 2025 and beyond.",
-    "author": "Alexander Reed"
+    "author": "House of Parise Reed"
 }
 
 TEST_CONSULTATION = {
