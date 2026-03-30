@@ -1332,14 +1332,20 @@ function AboutSection() {
             className="relative"
           >
             <TiltCard>
-              <div className="relative aspect-[4/5] overflow-hidden">
+              <div className="relative aspect-[4/5] overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 group">
                 <img
                   src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800"
                   alt="House of Persis Consultant"
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-transparent to-transparent opacity-60"></div>
                 <div className="absolute inset-4 border border-[#c9a86c]/20 pointer-events-none"></div>
+                
+                {/* Top 1% Badge */}
+                <div className="absolute top-8 left-8 bg-[#0a0908]/80 backdrop-blur-md border border-[#c9a86c]/40 px-4 py-2 flex items-center gap-3 shadow-2xl z-10">
+                  <Crown size={18} className="text-[#c9a86c]" />
+                  <span className="text-[#c9a86c] text-lg lg:text-xl font-light tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</span>
+                </div>
               </div>
             </TiltCard>
           </motion.div>
@@ -1407,53 +1413,62 @@ function AboutSection() {
             className="order-1 lg:order-2"
           >
             <TiltCard>
-              <div className="relative aspect-[3/2] overflow-hidden grayscale brightness-75 hover:grayscale-0 hover:brightness-100 transition-all duration-1000">
+              <div className="relative aspect-[3/2] overflow-hidden grayscale brightness-75 hover:grayscale-0 hover:brightness-100 transition-all duration-1000 group">
                 <img
                   src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
                   alt="Premium Strategy Meeting"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-[#0a0908]/20 group-hover:bg-transparent transition-colors duration-700"></div>
-                <div className="absolute inset-0 border border-[#c9a86c]/10 m-3"></div>
+                <div className="absolute inset-0 border border-[#c9a86c]/10 m-3 pointer-events-none"></div>
+                
+                {/* Top 1% Badge */}
+                <div className="absolute top-6 left-6 md:top-8 md:left-8 bg-[#0a0908]/80 backdrop-blur-md border border-[#c9a86c]/40 px-4 py-2 flex items-center gap-3 shadow-2xl z-10 pointer-events-none">
+                  <Crown size={18} className="text-[#c9a86c]" />
+                  <span className="text-[#c9a86c] text-lg lg:text-xl font-light tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</span>
+                </div>
               </div>
             </TiltCard>
           </motion.div>
         </div>
 
-        {/* PART 3: Conclusion with Our Goal & Badge */}
-        <div className="max-w-4xl mx-auto border-t border-[#c9a86c]/10 pt-32">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-20"
-          >
-            <div className="inline-block mb-12 p-10 border border-[#c9a86c]/20 bg-[#c9a86c]/5 relative group">
-                <div className="absolute -top-3 -left-3 w-6 h-6 border-t border-l border-[#c9a86c]"></div>
-                <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b border-r border-[#c9a86c]"></div>
-                
-                <span className="text-[#c9a86c] text-xs tracking-[0.4em] uppercase mb-6 block">Our Ultimate Goal</span>
-                <p className="text-3xl md:text-5xl text-[#f5f0e8] font-light italic mb-8" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                    "Top 1% global consultants in the next 10 years"
-                </p>
 
-                {/* Final seal of quality */}
-                <div className="flex flex-col items-center gap-4 mt-10">
-                  <div className="w-16 h-16 border border-[#c9a86c]/30 rounded-full flex items-center justify-center p-3">
-                    <Crown className="text-[#c9a86c]" size={32} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-light text-[#f5f0e8]" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</p>
-                    <p className="text-[#c9a86c]/60 text-[10px] tracking-widest uppercase">Global Consultants</p>
-                  </div>
-                </div>
-            </div>
-          </motion.div>
-
-        </div>
       </div>
     </section>
+  )
+}
+
+function ExpandableSubService({ title, children, hasViewMore = true }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div>
+      <h4 
+        onClick={() => hasViewMore && setOpen(!open)}
+        className={`text-[#c9a86c] text-lg font-medium flex items-center gap-2 ${hasViewMore ? 'cursor-pointer mb-2' : 'mb-2'}`}
+      >
+        {title} 
+        {hasViewMore && (
+          <span className="text-[10px] uppercase tracking-wider opacity-60 hover:underline mb-0">
+            {open ? 'View less' : 'View more'}
+          </span>
+        )}
+      </h4>
+      <AnimatePresence initial={false}>
+        {(!hasViewMore || open) && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className={hasViewMore ? "pt-1" : ""}>
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
@@ -1493,11 +1508,7 @@ function ServicesSection() {
       title: 'Website/Social Media Management',
       customContent: (
         <div className="space-y-6 text-[#e8dcc8]/50 font-light mt-4">
-          <div>
-            <h4 className="text-[#c9a86c] text-lg mb-2 font-medium flex items-center gap-2">
-              Create your own website 
-              <span className="text-[10px] uppercase tracking-wider opacity-60 cursor-pointer hover:underline mb-0">View more</span>
-            </h4>
+          <ExpandableSubService title="Create your own website" hasViewMore={true}>
             <p className="mb-3 text-sm">Your website is the first handshake your business makes. We make sure it leaves a lasting impression — beautifully designed, strategically built, and impossible to forget.</p>
             <div className="bg-[#c9a86c]/5 border border-[#c9a86c]/20 p-4 mt-2 mb-4">
               <p className="mb-2 italic text-[#f5f0e8] text-sm">Get your website custom made starting from 6999</p>
@@ -1508,11 +1519,10 @@ function ServicesSection() {
                 Book your free consultation
               </button>
             </div>
-          </div>
-          <div>
-            <h4 className="text-[#c9a86c] text-lg mb-2 font-medium">Social Media Management</h4>
+          </ExpandableSubService>
+          <ExpandableSubService title="Social Media Management" hasViewMore={false}>
             <p className="text-sm">In a world that never stops scrolling, consistency is everything. We craft content, manage communities, and build social strategies that keep your brand at the top of every feed.</p>
-          </div>
+          </ExpandableSubService>
         </div>
       )
     },
@@ -1521,20 +1531,12 @@ function ServicesSection() {
       title: 'Elevated Marketing',
       customContent: (
         <div className="space-y-6 text-[#e8dcc8]/50 font-light mt-4">
-          <div>
-            <h4 className="text-[#c9a86c] text-lg mb-2 font-medium flex items-center gap-2">
-              Performance Marketing 
-              <span className="text-[10px] uppercase tracking-wider opacity-60 cursor-pointer hover:underline mb-0">View more</span>
-            </h4>
+          <ExpandableSubService title="Performance Marketing" hasViewMore={true}>
             <p className="text-sm">Social media gets you the views and makes you visible but if you want those views to turn into leads, then choose performance marketing.</p>
-          </div>
-          <div>
-            <h4 className="text-[#c9a86c] text-lg mb-2 font-medium flex items-center gap-2">
-              Guerilla Marketing 
-              <span className="text-[10px] uppercase tracking-wider opacity-60 cursor-pointer hover:underline mb-0">View more</span>
-            </h4>
+          </ExpandableSubService>
+          <ExpandableSubService title="Guerilla Marketing" hasViewMore={true}>
             <p className="text-sm">The most effective way for customers to interact with your business and turn customers into lifelong advocates.</p>
-          </div>
+          </ExpandableSubService>
         </div>
       )
     },
