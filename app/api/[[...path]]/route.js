@@ -73,6 +73,14 @@ export async function GET(request, { params }) {
       return jsonResponse({ success: true, data: articles })
     }
 
+    // Get booked slots
+    if (endpoint === 'booked-slots') {
+      const database = await getDb()
+      const contacts = await database.collection('contacts').find({ timeSlot: { $exists: true, $ne: '' } }).toArray()
+      const bookedSlots = contacts.map(c => c.timeSlot)
+      return jsonResponse({ success: true, data: bookedSlots })
+    }
+
     return jsonResponse({ error: 'Not found' }, 404)
   } catch (error) {
     console.error('GET Error:', error)
@@ -89,19 +97,32 @@ export async function POST(request, { params }) {
 
     // Contact form submission
     if (endpoint === 'contact') {
-      const { name, email, company, message } = body
+      const { name, email, company, message, phone, problems, servicesLookingFor, mode, inPune, timeSlot } = body
 
-      if (!name || !email || !message) {
-        return jsonResponse({ error: 'Name, email, and message are required' }, 400)
+      if (!name || !email) {
+        return jsonResponse({ error: 'Name and email are required' }, 400)
       }
 
       const database = await getDb()
+
+      if (timeSlot) {
+        const existing = await database.collection('contacts').findOne({ timeSlot })
+        if (existing) {
+          return jsonResponse({ error: 'This time slot is already booked.' }, 400)
+        }
+      }
+
       const contact = {
         id: uuidv4(),
         name,
         email,
+        phone: phone || '',
         company: company || '',
-        message,
+        message: message || problems || '',
+        servicesLookingFor: servicesLookingFor || '',
+        mode: mode || 'online',
+        inPune: inPune !== undefined ? inPune : true,
+        timeSlot: timeSlot || '',
         status: 'new',
         createdAt: new Date().toISOString()
       }

@@ -2173,6 +2173,24 @@ function ContactSection() {
   const [mode, setMode] = useState('online') // online or offline
   const [inPune, setInPune] = useState(true)
   const [timeSlot, setTimeSlot] = useState('')
+  const [bookedSlots, setBookedSlots] = useState([])
+
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      try {
+        const response = await fetch('/api/booked-slots')
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success && result.data) {
+            setBookedSlots(result.data)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch booked slots', err)
+      }
+    }
+    fetchBookedSlots()
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -2381,27 +2399,46 @@ function ContactSection() {
 
                     <div className="space-y-4">
                       <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Select a time when you are available:</Label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {mode === 'online' ? (
-                          <button
-                            type="button"
-                            onClick={() => setTimeSlot('10.30am-5pm')}
-                            className={`p-4 text-xs tracking-widest border transition-all ${timeSlot === '10.30am-5pm' ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
-                          >
-                            Morning 10.30 am - 5 pm
-                          </button>
+                          <>
+                            {['10:30 am - 11:30 am', '11:30 am - 12:30 pm', '12:30 pm - 1:30 pm', '3:00 pm - 4:00 pm', '4:00 pm - 5:00 pm', '5:00 pm - 6:00 pm'].map((slot) => {
+                              const isBooked = bookedSlots.includes(slot)
+                              return (
+                                <button
+                                  key={slot}
+                                  type="button"
+                                  disabled={isBooked}
+                                  onClick={() => setTimeSlot(slot)}
+                                  className={`p-4 text-xs tracking-widest border transition-all relative ${isBooked ? 'bg-[#ff4444]/5 border-[#ff4444]/20 text-[#ff4444]/50 cursor-not-allowed' : timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
+                                >
+                                  {slot}
+                                  {isBooked && (
+                                    <span className="absolute bottom-1 right-2 text-[9px] uppercase tracking-wider text-[#ff4444]/80 font-bold">Booked</span>
+                                  )}
+                                </button>
+                              )
+                            })}
+                          </>
                         ) : (
                           <>
-                            {['10am-1pm', '2pm-5pm', '7pm-9pm'].map((slot) => (
-                              <button
-                                key={slot}
-                                type="button"
-                                onClick={() => setTimeSlot(slot)}
-                                className={`p-4 text-xs tracking-widest border transition-all ${timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
-                              >
-                                {slot === '10am-1pm' ? 'Morning 10 am - 1 pm' : slot === '2pm-5pm' ? 'Afternoon 2 pm - 5 pm' : 'Evening 7 pm - 9 pm'}
-                              </button>
-                            ))}
+                            {['11 am - 12 pm', '12 pm - 1 pm', '1 pm - 2 pm', '3 pm - 4 pm', '4 pm - 5 pm', '5:30 pm - 6:30 pm', '6:30 pm - 7:30 pm', '7:30 pm - 8:30 pm'].map((slot) => {
+                              const isBooked = bookedSlots.includes(slot)
+                              return (
+                                <button
+                                  key={slot}
+                                  type="button"
+                                  disabled={isBooked}
+                                  onClick={() => setTimeSlot(slot)}
+                                  className={`p-4 text-xs tracking-widest border transition-all relative ${isBooked ? 'bg-[#ff4444]/5 border-[#ff4444]/20 text-[#ff4444]/50 cursor-not-allowed' : timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
+                                >
+                                  {slot}
+                                  {isBooked && (
+                                    <span className="absolute bottom-1 right-2 text-[9px] uppercase tracking-wider text-[#ff4444]/80 font-bold">Booked</span>
+                                  )}
+                                </button>
+                              )
+                            })}
                           </>
                         )}
                       </div>
