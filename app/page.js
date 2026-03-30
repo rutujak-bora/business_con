@@ -7,14 +7,14 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { 
-  ArrowRight, 
-  Menu, 
-  X, 
-  ChevronDown, 
-  Target, 
-  Zap, 
-  Globe, 
+import {
+  ArrowRight,
+  Menu,
+  X,
+  ChevronDown,
+  Target,
+  Zap,
+  Globe,
   Rocket,
   CheckCircle,
   ArrowUpRight,
@@ -88,7 +88,7 @@ function CustomCursor({ muted }) {
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.03)
       osc.start(ctx.currentTime)
       osc.stop(ctx.currentTime + 0.03)
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // Crisp click on mousedown
@@ -115,7 +115,7 @@ function CustomCursor({ muted }) {
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04)
       source.start(ctx.currentTime)
       source.stop(ctx.currentTime + 0.04)
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // Soft release on mouseup
@@ -134,7 +134,7 @@ function CustomCursor({ muted }) {
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05)
       osc.start(ctx.currentTime)
       osc.stop(ctx.currentTime + 0.05)
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // ── Cursor movement & animation loop ──────────────────
@@ -409,11 +409,10 @@ function BackgroundMusic({ cursorMuted, setCursorMuted }) {
           onMouseLeave={() => setShowVolume(false)}
           style={{ cursor: 'none' }}
           title={playing ? 'Pause music' : 'Play ambient music'}
-          className={`relative w-9 h-9 md:w-11 md:h-11 flex flex-col items-center justify-center border transition-all duration-500 backdrop-blur-sm ${
-            playing
-              ? 'border-[#c9a86c]/60 bg-[#c9a86c]/10 text-[#c9a86c]'
-              : 'border-[#c9a86c]/20 bg-[#0a0908]/80 text-[#c9a86c]/50 hover:border-[#c9a86c]/40 hover:text-[#c9a86c]/80'
-          }`}
+          className={`relative w-9 h-9 md:w-11 md:h-11 flex flex-col items-center justify-center border transition-all duration-500 backdrop-blur-sm ${playing
+            ? 'border-[#c9a86c]/60 bg-[#c9a86c]/10 text-[#c9a86c]'
+            : 'border-[#c9a86c]/20 bg-[#0a0908]/80 text-[#c9a86c]/50 hover:border-[#c9a86c]/40 hover:text-[#c9a86c]/80'
+            }`}
         >
           {playing ? (
             <div className="flex items-end gap-[1.5px] h-3 md:h-4">
@@ -440,11 +439,10 @@ function BackgroundMusic({ cursorMuted, setCursorMuted }) {
         onClick={() => setCursorMuted(m => !m)}
         title={cursorMuted ? 'Unmute cursor' : 'Mute cursor'}
         style={{ cursor: 'none' }}
-        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center border backdrop-blur-sm transition-all duration-500 ${
-          !cursorMuted 
-            ? 'border-[#c9a86c]/40 bg-[#c9a86c]/5 text-[#c9a86c]'
-            : 'border-[#c9a86c]/20 bg-[#0a0908]/80 text-[#c9a86c]/40 hover:border-[#c9a86c]/40'
-        }`}
+        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center border backdrop-blur-sm transition-all duration-500 ${!cursorMuted
+          ? 'border-[#c9a86c]/40 bg-[#c9a86c]/5 text-[#c9a86c]'
+          : 'border-[#c9a86c]/20 bg-[#0a0908]/80 text-[#c9a86c]/40 hover:border-[#c9a86c]/40'
+          }`}
       >
         <span className="text-[12px] md:text-[14px]">{cursorMuted ? '🔇' : '🖱️'}</span>
       </button>
@@ -525,7 +523,7 @@ function WhatsAppButton() {
       title="Chat on WhatsApp"
     >
       <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
       </svg>
     </a>
   )
@@ -676,13 +674,13 @@ function FounderSection() {
               <span className="block italic text-[#c9a86c]/80">Driven by Purpose</span>
             </h2>
             <p className="text-[#e8dcc8]/60 text-lg mb-6 leading-relaxed font-light">
-              House of Persis was born from a deep conviction — that every business, no matter its size or stage, 
-              deserves world-class strategic guidance. Our founder built this firm on the belief that 
+              House of Persis was born from a deep conviction — that every business, no matter its size or stage,
+              deserves world-class strategic guidance. Our founder built this firm on the belief that
               real growth comes from real partnership.
             </p>
             <p className="text-[#e8dcc8]/50 mb-8 leading-relaxed">
-              With years of hands-on experience across industries, our team doesn't just advise — 
-              we walk beside you, turning your vision into a blueprint, your blueprint into action, 
+              With years of hands-on experience across industries, our team doesn't just advise —
+              we walk beside you, turning your vision into a blueprint, your blueprint into action,
               and your action into a legacy that outlasts you.
             </p>
             <div className="grid grid-cols-3 gap-6 pt-8 border-t border-[#c9a86c]/10">
@@ -866,10 +864,10 @@ function TiltCard({ children, className = '' }) {
   const ref = useRef(null)
   const x = useMotionValue(0)
   const y = useMotionValue(0)
-  
+
   const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 })
   const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 })
-  
+
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"])
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"])
 
@@ -954,14 +952,14 @@ function ParallaxSection({ children, className = '', speed = 0.5 }) {
 // Intro Animation Component
 function IntroAnimation({ onComplete }) {
   const [phase, setPhase] = useState(0)
-  
+
   useEffect(() => {
     const timer1 = setTimeout(() => setPhase(1), 300)
     const timer2 = setTimeout(() => setPhase(2), 1200)
     const timer3 = setTimeout(() => setPhase(3), 2200)
     const timer4 = setTimeout(() => setPhase(4), 3000)
     const timer5 = setTimeout(() => onComplete(), 3800)
-    
+
     return () => {
       clearTimeout(timer1)
       clearTimeout(timer2)
@@ -1008,7 +1006,7 @@ function IntroAnimation({ onComplete }) {
         <motion.div
           className="relative mb-8"
           initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ 
+          animate={{
             opacity: phase >= 1 ? 1 : 0,
             scale: phase >= 1 ? 1 : 0.8,
           }}
@@ -1024,7 +1022,7 @@ function IntroAnimation({ onComplete }) {
             }}
             transition={{ duration: 0.5 }}
           />
-          
+
           {/* Glow effect */}
           <motion.div
             className="absolute inset-0 blur-2xl opacity-20"
@@ -1038,7 +1036,7 @@ function IntroAnimation({ onComplete }) {
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ 
+          animate={{
             opacity: phase >= 2 ? 1 : 0,
             y: phase >= 2 ? 0 : 30,
           }}
@@ -1101,15 +1099,14 @@ function Navigation() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? 'glass-card py-3' : 'py-6 bg-transparent'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'glass-card py-3' : 'py-6 bg-transparent'
+        }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         <a href="#" className="flex items-center gap-3">
-          <img 
-            src={LOGO_URL} 
-            alt="House of Persis" 
+          <img
+            src={LOGO_URL}
+            alt="House of Persis"
             className="h-10 w-10 object-contain"
             style={{ filter: 'invert(1) brightness(0.95) sepia(0.15)' }}
           />
@@ -1129,7 +1126,7 @@ function Navigation() {
               {link.name}
             </a>
           ))}
-          <Button 
+          <Button
             onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
             className="bg-transparent border border-[#c9a86c]/40 text-[#c9a86c] hover:bg-[#c9a86c]/10 hover:border-[#c9a86c] rounded-none px-6 py-5 text-xs tracking-[0.1em] uppercase transition-all duration-300"
           >
@@ -1193,10 +1190,10 @@ function HeroSection() {
       <div className="absolute inset-0 bg-[#0a0908]">
         {/* Radial gradient */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(201,168,108,0.05)_0%,transparent_70%)]"></div>
-        
+
         {/* Decorative pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(201,168,108,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(201,168,108,0.02)_1px,transparent_1px)] bg-[size:80px_80px]"></div>
-        
+
         {/* Floating elements */}
         <motion.div
           animate={{
@@ -1260,7 +1257,7 @@ function HeroSection() {
             transition={{ duration: 0.7, delay: 0.6 }}
             className="text-base md:text-lg text-[#e8dcc8]/60 max-w-2xl mx-auto mb-12 leading-relaxed font-light"
           >
-            Where strategic excellence meets timeless elegance. We craft bespoke business 
+            Where strategic excellence meets timeless elegance. We craft bespoke business
             strategies that elevate brands, inspire growth, and create enduring success.
           </motion.p>
 
@@ -1270,9 +1267,9 @@ function HeroSection() {
             transition={{ duration: 0.6, delay: 0.8 }}
             className="flex flex-col sm:flex-row gap-6 justify-center"
           >
-            <Button 
-                onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
-              size="lg" 
+            <Button
+              onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+              size="lg"
               className="bg-[#c9a86c] hover:bg-[#b8956d] text-[#0a0908] rounded-none px-10 py-7 text-xs tracking-[0.15em] uppercase font-medium group"
             >
               Book a Free consultation
@@ -1319,7 +1316,7 @@ function AboutSection() {
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#c9a86c]/[0.02] to-transparent"></div>
-      
+
       <div className="container mx-auto px-6">
         {/* PART 1: Introduction */}
         <div ref={ref} className="grid lg:grid-cols-2 gap-20 items-center mb-32">
@@ -1340,11 +1337,11 @@ function AboutSection() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0908] via-transparent to-transparent opacity-60"></div>
                 <div className="absolute inset-4 border border-[#c9a86c]/20 pointer-events-none"></div>
-                
+
                 {/* Top 1% Badge */}
-                <div className="absolute top-8 left-8 bg-[#0a0908]/80 backdrop-blur-md border border-[#c9a86c]/40 px-4 py-2 flex items-center gap-3 shadow-2xl z-10">
-                  <Crown size={18} className="text-[#c9a86c]" />
-                  <span className="text-[#c9a86c] text-lg lg:text-xl font-light tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</span>
+                <div className="absolute top-8 left-8 bg-[#c9a86c] px-4 py-2 flex items-center gap-3 shadow-xl z-10">
+                  <Crown size={18} className="text-[#0a0908]" />
+                  <span className="text-[#0a0908] text-lg lg:text-xl font-semibold tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</span>
                 </div>
               </div>
             </TiltCard>
@@ -1363,13 +1360,13 @@ function AboutSection() {
               <span className="block text-[#c9a86c]/80 italic">Ambition & Roadmap</span>
             </h2>
             <p className="text-[#e8dcc8]/60 text-lg mb-6 leading-relaxed font-light">
-              Most businesses have ambition to grow. Few have a roadmap. At House of Persis, we close that gap - 
+              Most businesses have ambition to grow. Few have a roadmap. At House of Persis, we close that gap -
               walking alongside you from your very first step to the moment your business becomes a name that outlasts you.
             </p>
             <p className="text-[#e8dcc8]/50 mb-10 leading-relaxed">
-              Whether you're starting from scratch or scaling an established brand, we bring structure to your 
-              vision and strategy to your growth. From company registration and brand positioning to digital 
-              marketing, franchise expansion, and financial clarity - we handle the full spectrum of your 
+              Whether you're starting from scratch or scaling an established brand, we bring structure to your
+              vision and strategy to your growth. From company registration and brand positioning to digital
+              marketing, franchise expansion, and financial clarity - we handle the full spectrum of your
               business transformation.
             </p>
           </motion.div>
@@ -1390,11 +1387,11 @@ function AboutSection() {
               Because good advice is common. A growth partner is rare.
             </p>
             <p className="text-[#e8dcc8]/50 mb-10 leading-relaxed">
-              In a world full of consultants who hand you a report and walk away, House of Persis is different. 
-              We stay. We strategise, implement, refine, and grow - with you, not just for you. 
-              We work with you from end to end. From day one of your business to the day it runs without you. 
-              We tailor every strategy according to your business needs, not just copy pasting what works 
-              for other businesses. We measure what matters. Not the likes on your social media post, 
+              In a world full of consultants who hand you a report and walk away, House of Persis is different.
+              We stay. We strategise, implement, refine, and grow - with you, not just for you.
+              We work with you from end to end. From day one of your business to the day it runs without you.
+              We tailor every strategy according to your business needs, not just copy pasting what works
+              for other businesses. We measure what matters. Not the likes on your social media post,
               but the profit growth and customer satisfaction.
             </p>
 
@@ -1421,11 +1418,11 @@ function AboutSection() {
                 />
                 <div className="absolute inset-0 bg-[#0a0908]/20 group-hover:bg-transparent transition-colors duration-700"></div>
                 <div className="absolute inset-0 border border-[#c9a86c]/10 m-3 pointer-events-none"></div>
-                
+
                 {/* Top 1% Badge */}
-                <div className="absolute top-6 left-6 md:top-8 md:left-8 bg-[#0a0908]/80 backdrop-blur-md border border-[#c9a86c]/40 px-4 py-2 flex items-center gap-3 shadow-2xl z-10 pointer-events-none">
-                  <Crown size={18} className="text-[#c9a86c]" />
-                  <span className="text-[#c9a86c] text-lg lg:text-xl font-light tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</span>
+                <div className="absolute top-6 left-6 md:top-8 md:left-8 bg-[#c9a86c] px-4 py-2 flex items-center gap-3 shadow-xl z-10 pointer-events-none">
+                  <Crown size={18} className="text-[#0a0908]" />
+                  <span className="text-[#0a0908] text-lg lg:text-xl font-semibold tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Top 1%</span>
                 </div>
               </div>
             </TiltCard>
@@ -1442,11 +1439,11 @@ function ExpandableSubService({ title, children, hasViewMore = true }) {
   const [open, setOpen] = useState(false)
   return (
     <div>
-      <h4 
+      <h4
         onClick={() => hasViewMore && setOpen(!open)}
         className={`text-[#c9a86c] text-lg font-medium flex items-center gap-2 ${hasViewMore ? 'cursor-pointer mb-2' : 'mb-2'}`}
       >
-        {title} 
+        {title}
         {hasViewMore && (
           <span className="text-[10px] uppercase tracking-wider opacity-60 hover:underline mb-0">
             {open ? 'View less' : 'View more'}
@@ -1504,41 +1501,16 @@ function ServicesSection() {
       features: ['Event Activation', 'Print Media', 'Community Engagement', 'Physical Presence']
     },
     {
-      icon: MessageCircle,
+      icon: Star,
       title: 'Website/Social Media Management',
-      customContent: (
-        <div className="space-y-6 text-[#e8dcc8]/50 font-light mt-4">
-          <ExpandableSubService title="Create your own website" hasViewMore={true}>
-            <p className="mb-3 text-sm">Your website is the first handshake your business makes. We make sure it leaves a lasting impression — beautifully designed, strategically built, and impossible to forget.</p>
-            <div className="bg-[#c9a86c]/5 border border-[#c9a86c]/20 p-4 mt-2 mb-4">
-              <p className="mb-2 italic text-[#f5f0e8] text-sm">Get your website custom made starting from 6999</p>
-              <button 
-                onClick={(e) => { e.stopPropagation(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }) }} 
-                className="text-xs tracking-wider text-[#c9a86c] hover:text-[#f5f0e8] uppercase underline underline-offset-4"
-              >
-                Book your free consultation
-              </button>
-            </div>
-          </ExpandableSubService>
-          <ExpandableSubService title="Social Media Management" hasViewMore={false}>
-            <p className="text-sm">In a world that never stops scrolling, consistency is everything. We craft content, manage communities, and build social strategies that keep your brand at the top of every feed.</p>
-          </ExpandableSubService>
-        </div>
-      )
+      description: 'Create your own website - View more Your website is the first handshake your business makes. We make sure it leaves a lasting impression — beautifully designed, strategically built, and impossible to forget.Get your website custom made starting from 6999 Book your free consultation (once they tap on here, take them to consultation column) Social Media Management - In a world that never stops scrolling, consistency is everything. We craft content, manage communities, and build social strategies that keep your brand at the top of every feed.',
+      features: ['Event Activation', 'Print Media', 'Community Engagement', 'Physical Presence']
     },
     {
-      icon: TrendingUp,
+      icon: Star,
       title: 'Elevated Marketing',
-      customContent: (
-        <div className="space-y-6 text-[#e8dcc8]/50 font-light mt-4">
-          <ExpandableSubService title="Performance Marketing" hasViewMore={true}>
-            <p className="text-sm">Social media gets you the views and makes you visible but if you want those views to turn into leads, then choose performance marketing.</p>
-          </ExpandableSubService>
-          <ExpandableSubService title="Guerilla Marketing" hasViewMore={true}>
-            <p className="text-sm">The most effective way for customers to interact with your business and turn customers into lifelong advocates.</p>
-          </ExpandableSubService>
-        </div>
-      )
+      description: 'Below Offline Marketing - Elevated Marketing Performance Marketing  - View more - Social media gets you the views and makes you visible but if you want those views to turn into leads, then choose performance marketing. Guerilla Marketing - View more - The most effective way for customers to interact with your business and turn customers into lifelong advocates.',
+      features: ['Event Activation', 'Print Media', 'Community Engagement', 'Physical Presence']
     },
     {
       icon: Award,
@@ -1562,7 +1534,7 @@ function ServicesSection() {
   return (
     <section id="services" className="py-32 md:py-40 relative">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent"></div>
-      
+
       <div className="container mx-auto px-6">
         <motion.div
           ref={ref}
@@ -1614,7 +1586,7 @@ function ServicesSection() {
                             <p className="text-[#e8dcc8]/50 mb-6 font-light">
                               {service.description}
                             </p>
-                            
+
                             <AnimatePresence>
                               {hoveredIndex === index && (
                                 <motion.div
@@ -1688,7 +1660,7 @@ function CaseStudiesSection() {
   return (
     <section id="cases" className="py-32 md:py-40 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#c9a86c]/[0.02] to-transparent"></div>
-      
+
       <div className="container mx-auto px-6">
         <motion.div
           ref={ref}
@@ -1736,7 +1708,7 @@ function CaseStudiesSection() {
                         </span>
                       </div>
                     </div>
-                    
+
                     <div className="p-10 lg:p-16 flex flex-col justify-center">
                       <div className="mb-6">
                         <span className="text-[#c9a86c] text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{caseStudy.result}</span>
@@ -1745,7 +1717,7 @@ function CaseStudiesSection() {
                         {caseStudy.title}
                       </h3>
                       <p className="text-[#e8dcc8]/50 mb-8 font-light">{caseStudy.description}</p>
-                      
+
                       <div className="flex gap-12 mb-8">
                         {caseStudy.metrics.map((metric) => (
                           <div key={metric.label}>
@@ -1754,14 +1726,14 @@ function CaseStudiesSection() {
                           </div>
                         ))}
                       </div>
-                      
+
                       <div className="relative z-[30]">
-                        <Button 
+                        <Button
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedCase(caseStudy);
                           }}
-                          variant="outline" 
+                          variant="outline"
                           className="border-[#c9a86c]/30 text-[#c9a86c] hover:bg-[#c9a86c]/20 hover:border-[#c9a86c] rounded-none w-fit group/btn text-xs tracking-wider uppercase pointer-events-auto"
                         >
                           View Full Story
@@ -1787,19 +1759,19 @@ function CaseStudiesSection() {
             className="fixed inset-0 z-[99999] flex items-center justify-center p-6 md:p-12 lg:p-24"
             style={{ cursor: 'none' }}
           >
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-[#0a0908]/95 backdrop-blur-xl"
               onClick={() => setSelectedCase(null)}
             />
-            
+
             <motion.div
               layoutId={`case-${selectedCase.title}`}
               className="relative w-full max-w-5xl bg-[#0a0908] border border-[#c9a86c]/20 shadow-2xl overflow-hidden flex flex-col lg:flex-row h-full max-h-[85vh] lg:h-auto"
             >
-              <button 
+              <button
                 onClick={() => setSelectedCase(null)}
                 className="absolute top-6 right-6 z-10 w-10 h-10 border border-[#c9a86c]/20 flex items-center justify-center text-[#c9a86c] hover:bg-[#c9a86c]/10 transition-all"
               >
@@ -1808,8 +1780,8 @@ function CaseStudiesSection() {
 
               {/* Image Side */}
               <div className="lg:w-1/2 relative h-64 lg:h-auto overflow-hidden">
-                <img 
-                  src={selectedCase.image} 
+                <img
+                  src={selectedCase.image}
                   alt={selectedCase.title}
                   className="w-full h-full object-cover grayscale active-glow"
                 />
@@ -1818,7 +1790,7 @@ function CaseStudiesSection() {
 
               {/* Content Side */}
               <div className="lg:w-1/2 p-10 md:p-14 overflow-y-auto bg-gradient-to-br from-[#0a0908] to-[#151210]">
-                <motion.span 
+                <motion.span
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
@@ -1826,25 +1798,25 @@ function CaseStudiesSection() {
                 >
                   Legacy | {selectedCase.category}
                 </motion.span>
-                
-                <motion.h2 
+
+                <motion.h2
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-3xl md:text-5xl text-[#f5f0e8] mb-8 font-light leading-tight" 
+                  className="text-3xl md:text-5xl text-[#f5f0e8] mb-8 font-light leading-tight"
                   style={{ fontFamily: 'Cormorant Garamond, serif' }}
                 >
                   {selectedCase.title}
                 </motion.h2>
 
-                <motion.div 
-                   initial={{ opacity: 0, scaleX: 0 }}
-                   animate={{ opacity: 1, scaleX: 1 }}
-                   transition={{ delay: 0.4, duration: 0.6 }}
-                   className="w-16 h-px bg-[#c9a86c] mb-8 origin-left"
+                <motion.div
+                  initial={{ opacity: 0, scaleX: 0 }}
+                  animate={{ opacity: 1, scaleX: 1 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                  className="w-16 h-px bg-[#c9a86c] mb-8 origin-left"
                 />
 
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
@@ -1854,7 +1826,7 @@ function CaseStudiesSection() {
                   {selectedCase.result}
                 </motion.p>
 
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
@@ -1863,7 +1835,7 @@ function CaseStudiesSection() {
                   <p className="text-[#e8dcc8]/70 leading-relaxed font-light text-lg">
                     {selectedCase.fullStory}
                   </p>
-                  
+
                   <div className="grid grid-cols-2 gap-8 pt-10 border-t border-[#c9a86c]/10">
                     {selectedCase.metrics.map((metric, i) => (
                       <div key={i}>
@@ -1874,13 +1846,13 @@ function CaseStudiesSection() {
                   </div>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8 }}
                   className="mt-12"
                 >
-                  <Button 
+                  <Button
                     onClick={() => setSelectedCase(null)}
                     className="bg-[#c9a86c] hover:bg-[#b8956d] text-[#0a0908] rounded-none px-8 py-6 h-auto tracking-[0.2em] uppercase text-xs"
                   >
@@ -1936,7 +1908,7 @@ function ProcessSection() {
   return (
     <section id="process" className="py-32 md:py-40 relative">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent"></div>
-      
+
       <div className="container mx-auto px-6">
         <motion.div
           ref={ref}
@@ -1957,7 +1929,7 @@ function ProcessSection() {
         <div className="relative">
           {/* Connection line */}
           <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent transform -translate-y-1/2"></div>
-          
+
           <motion.div
             initial="hidden"
             animate={isInView ? 'visible' : 'hidden'}
@@ -1972,24 +1944,21 @@ function ProcessSection() {
                 className="relative group"
               >
                 <TiltCard>
-                  <Card className={`bg-transparent border-[#c9a86c]/10 transition-all duration-700 h-full ${
-                    activeStep === index ? 'border-[#c9a86c]/40 glow-gold' : 'hover:border-[#c9a86c]/20'
-                  }`}>
+                  <Card className={`bg-transparent border-[#c9a86c]/10 transition-all duration-700 h-full ${activeStep === index ? 'border-[#c9a86c]/40 glow-gold' : 'hover:border-[#c9a86c]/20'
+                    }`}>
                     <CardContent className="p-8">
                       <div className="relative z-10">
                         <span className="text-6xl font-light text-[#c9a86c]/5 absolute -top-4 -left-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                           {step.number}
                         </span>
-                        <div className={`w-14 h-14 border flex items-center justify-center mb-6 transition-all duration-500 ${
-                          activeStep === index ? 'border-[#c9a86c] bg-[#c9a86c]/10' : 'border-[#c9a86c]/20 group-hover:border-[#c9a86c]/40'
-                        }`}>
-                          <step.icon className={`${
-                            activeStep === index ? 'text-[#c9a86c]' : 'text-[#c9a86c]/60'
-                          }`} size={24} />
+                        <div className={`w-14 h-14 border flex items-center justify-center mb-6 transition-all duration-500 ${activeStep === index ? 'border-[#c9a86c] bg-[#c9a86c]/10' : 'border-[#c9a86c]/20 group-hover:border-[#c9a86c]/40'
+                          }`}>
+                          <step.icon className={`${activeStep === index ? 'text-[#c9a86c]' : 'text-[#c9a86c]/60'
+                            }`} size={24} />
                         </div>
                         <h3 className="text-xl text-[#f5f0e8] mb-3 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{step.title}</h3>
                         <p className="text-[#e8dcc8]/50 text-sm mb-6 font-light">{step.description}</p>
-                        
+
                         <AnimatePresence>
                           {activeStep === index && (
                             <motion.div
@@ -2012,12 +1981,11 @@ function ProcessSection() {
                     </CardContent>
                   </Card>
                 </TiltCard>
-                
+
                 {/* Connection dot */}
                 <div className="hidden lg:block absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-                  <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${
-                    activeStep === index ? 'bg-[#c9a86c]' : 'bg-[#c9a86c]/20'
-                  }`}></div>
+                  <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${activeStep === index ? 'bg-[#c9a86c]' : 'bg-[#c9a86c]/20'
+                    }`}></div>
                 </div>
               </motion.div>
             ))}
@@ -2065,7 +2033,7 @@ function TestimonialsSection() {
   return (
     <section className="py-32 md:py-40 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-[#c9a86c]/[0.02] via-transparent to-[#c9a86c]/[0.02]"></div>
-      
+
       <div className="container mx-auto px-6">
         <motion.div
           ref={ref}
@@ -2088,7 +2056,7 @@ function TestimonialsSection() {
         >
           <div className="relative">
             <Quote className="absolute -top-8 left-1/2 -translate-x-1/2 text-[#c9a86c]/10" size={100} />
-            
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeIndex}
@@ -2122,9 +2090,8 @@ function TestimonialsSection() {
               <button
                 key={index}
                 onClick={() => setActiveIndex(index)}
-                className={`h-px transition-all duration-500 ${
-                  index === activeIndex ? 'w-12 bg-[#c9a86c]' : 'w-6 bg-[#c9a86c]/20 hover:bg-[#c9a86c]/40'
-                }`}
+                className={`h-px transition-all duration-500 ${index === activeIndex ? 'w-12 bg-[#c9a86c]' : 'w-6 bg-[#c9a86c]/20 hover:bg-[#c9a86c]/40'
+                  }`}
               />
             ))}
           </div>
@@ -2166,7 +2133,7 @@ function InsightsSection() {
   return (
     <section id="insights" className="py-32 md:py-40 relative">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent"></div>
-      
+
       <div className="container mx-auto px-6">
         <motion.div
           ref={ref}
@@ -2242,14 +2209,14 @@ function ContactSection() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, mode, inPune, timeSlot })
       })
-      
+
       if (response.ok) {
         setSubmitted(true)
         setFormData({ name: '', email: '', phone: '', company: '', problems: '', servicesLookingFor: '', timeSlot: '' })
@@ -2264,7 +2231,7 @@ function ContactSection() {
   return (
     <section id="contact" className="py-32 md:py-40 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-t from-[#c9a86c]/[0.03] via-transparent to-transparent"></div>
-      
+
       <div className="container mx-auto px-6">
         <motion.div
           ref={ref}
@@ -2280,19 +2247,19 @@ function ContactSection() {
           <motion.p variants={fadeInUp} className="text-[#e8dcc8]/50 max-w-2xl mx-auto text-lg font-light mb-8">
             Your first consultation is completely free. Just an honest conversation about where your business is and where it could go.
           </motion.p>
-          
+
           <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-6 mb-12">
             <div className="p-4 border border-[#c9a86c]/20 bg-[#0a0908] min-w-[200px]">
-                <p className="text-[#c9a86c] text-xs uppercase tracking-widest mb-1">1st Consultation</p>
-                <p className="text-2xl text-[#f5f0e8] font-light">FREE</p>
+              <p className="text-[#c9a86c] text-xs uppercase tracking-widest mb-1">1st Consultation</p>
+              <p className="text-2xl text-[#f5f0e8] font-light">FREE</p>
             </div>
             <div className="p-4 border border-[#c9a86c]/10 bg-[#0a0908] min-w-[200px]">
-                <p className="text-[#c9a86c]/60 text-xs uppercase tracking-widest mb-1">2nd Online</p>
-                <p className="text-2xl text-[#f5f0e8] font-light">₹999</p>
+              <p className="text-[#c9a86c]/60 text-xs uppercase tracking-widest mb-1">2nd Online</p>
+              <p className="text-2xl text-[#f5f0e8] font-light">₹999</p>
             </div>
             <div className="p-4 border border-[#c9a86c]/10 bg-[#0a0908] min-w-[200px]">
-                <p className="text-[#c9a86c]/60 text-xs uppercase tracking-widest mb-1">2nd Offline</p>
-                <p className="text-2xl text-[#f5f0e8] font-light">₹1799</p>
+              <p className="text-[#c9a86c]/60 text-xs uppercase tracking-widest mb-1">2nd Offline</p>
+              <p className="text-2xl text-[#f5f0e8] font-light">₹1799</p>
             </div>
           </motion.div>
         </motion.div>
@@ -2305,18 +2272,18 @@ function ContactSection() {
             transition={{ duration: 0.8 }}
           >
             <div className="flex gap-4 mb-8">
-                <button 
-                    onClick={() => setMode('online')}
-                    className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'online' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
-                >
-                    Online
-                </button>
-                <button 
-                    onClick={() => setMode('offline')}
-                    className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'offline' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
-                >
-                    Offline
-                </button>
+              <button
+                onClick={() => setMode('online')}
+                className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'online' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
+              >
+                Online
+              </button>
+              <button
+                onClick={() => setMode('offline')}
+                className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'offline' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
+              >
+                Offline
+              </button>
             </div>
 
             <Card className="bg-transparent border-[#c9a86c]/10">
@@ -2332,15 +2299,15 @@ function ContactSection() {
                     </div>
                     <h3 className="text-2xl text-[#f5f0e8] mb-3 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Request Sent</h3>
                     <p className="text-[#e8dcc8]/50 font-light">
-                        {mode === 'online' 
-                            ? "We’ll be in touch with you in the next few hours to confirm your slot via email."
-                            : "We’ll be in touch with you in the next few hours to confirm your slot via phone call."}
+                      {mode === 'online'
+                        ? "We’ll be in touch with you in the next few hours to confirm your slot via email."
+                        : "We’ll be in touch with you in the next few hours to confirm your slot via phone call."}
                     </p>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <p className="text-[#c9a86c] text-sm italic mb-6">
-                        {mode === 'online' ? "Let's have a virtual coffee chat" : "Meet us in person. Let's talk strategy over a coffee"}
+                      {mode === 'online' ? "Let's have a virtual coffee chat" : "Meet us in person. Let's talk strategy over a coffee"}
                     </p>
 
                     <div className="grid md:grid-cols-2 gap-6">
@@ -2380,34 +2347,34 @@ function ContactSection() {
                     </div>
 
                     {mode === 'offline' && (
-                        <div className="flex items-center gap-4 p-4 border border-[#c9a86c]/10 bg-[#c9a86c]/5">
-                            <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Are you based in पुणे (Pune)?</Label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input 
-                                        type="radio" 
-                                        name="pune" 
-                                        onChange={() => setInPune(true)} 
-                                        checked={inPune}
-                                        className="accent-[#c9a86c]"
-                                    />
-                                    <span className="text-xs text-[#f5f0e8]">Yes</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input 
-                                        type="radio" 
-                                        name="pune" 
-                                        onChange={() => {
-                                            setInPune(false);
-                                            setMode('online');
-                                        }} 
-                                        checked={!inPune}
-                                        className="accent-[#c9a86c]"
-                                    />
-                                    <span className="text-xs text-[#f5f0e8]">No</span>
-                                </label>
-                            </div>
+                      <div className="flex items-center gap-4 p-4 border border-[#c9a86c]/10 bg-[#c9a86c]/5">
+                        <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Are you based in पुणे (Pune)?</Label>
+                        <div className="flex gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="pune"
+                              onChange={() => setInPune(true)}
+                              checked={inPune}
+                              className="accent-[#c9a86c]"
+                            />
+                            <span className="text-xs text-[#f5f0e8]">Yes</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="pune"
+                              onChange={() => {
+                                setInPune(false);
+                                setMode('online');
+                              }}
+                              checked={!inPune}
+                              className="accent-[#c9a86c]"
+                            />
+                            <span className="text-xs text-[#f5f0e8]">No</span>
+                          </label>
                         </div>
+                      </div>
                     )}
 
                     <div className="space-y-2">
@@ -2438,26 +2405,26 @@ function ContactSection() {
                       <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Select a time when you are available:</Label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {mode === 'online' ? (
-                            <button 
-                                type="button"
-                                onClick={() => setTimeSlot('10.30am-5pm')}
-                                className={`p-4 text-xs tracking-widest border transition-all ${timeSlot === '10.30am-5pm' ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
-                            >
-                                Morning 10.30 am - 5 pm
-                            </button>
+                          <button
+                            type="button"
+                            onClick={() => setTimeSlot('10.30am-5pm')}
+                            className={`p-4 text-xs tracking-widest border transition-all ${timeSlot === '10.30am-5pm' ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
+                          >
+                            Morning 10.30 am - 5 pm
+                          </button>
                         ) : (
-                            <>
-                                {['10am-1pm', '2pm-5pm', '7pm-9pm'].map((slot) => (
-                                    <button 
-                                        key={slot}
-                                        type="button"
-                                        onClick={() => setTimeSlot(slot)}
-                                        className={`p-4 text-xs tracking-widest border transition-all ${timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
-                                    >
-                                        {slot === '10am-1pm' ? 'Morning 10 am - 1 pm' : slot === '2pm-5pm' ? 'Afternoon 2 pm - 5 pm' : 'Evening 7 pm - 9 pm'}
-                                    </button>
-                                ))}
-                            </>
+                          <>
+                            {['10am-1pm', '2pm-5pm', '7pm-9pm'].map((slot) => (
+                              <button
+                                key={slot}
+                                type="button"
+                                onClick={() => setTimeSlot(slot)}
+                                className={`p-4 text-xs tracking-widest border transition-all ${timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
+                              >
+                                {slot === '10am-1pm' ? 'Morning 10 am - 1 pm' : slot === '2pm-5pm' ? 'Afternoon 2 pm - 5 pm' : 'Evening 7 pm - 9 pm'}
+                              </button>
+                            ))}
+                          </>
                         )}
                       </div>
                     </div>
@@ -2487,8 +2454,8 @@ function ContactSection() {
               <div>
                 <h3 className="text-2xl text-[#f5f0e8] mb-4 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Let's Talk Strategy</h3>
                 <p className="text-[#e8dcc8]/50 leading-relaxed font-light">
-                  Whether you're contemplating transformation or ready to begin, 
-                  we welcome the opportunity to understand your aspirations and 
+                  Whether you're contemplating transformation or ready to begin,
+                  we welcome the opportunity to understand your aspirations and
                   explore how we might serve your journey.
                 </p>
               </div>
@@ -2510,7 +2477,7 @@ function ContactSection() {
 
               <div className="pt-8 border-t border-[#c9a86c]/10">
                 <p className="text-[#e8dcc8]/40 mb-4 text-sm font-light italic">
-                    "Strategy is not just about making choices; it's about making choices that outlast you."
+                  "Strategy is not just about making choices; it's about making choices that outlast you."
                 </p>
               </div>
             </div>
@@ -2548,9 +2515,9 @@ function Footer() {
           {/* Brand */}
           <div>
             <a href="#" className="flex items-center gap-3 mb-6">
-              <img 
-                src={LOGO_URL} 
-                alt="House of Persis" 
+              <img
+                src={LOGO_URL}
+                alt="House of Persis"
                 className="h-12 w-12 object-contain"
                 style={{ filter: 'invert(1) brightness(0.95) sepia(0.15)' }}
               />
