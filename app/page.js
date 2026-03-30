@@ -564,38 +564,6 @@ function MobileStickyCTA() {
   )
 }
 
-// ─── 8. Numbers Banner ───
-function NumbersBanner() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
-  const numbers = [
-    { value: 42, suffix: '+', label: 'Success Stories' },
-    { value: 94, suffix: '%', label: 'Client Satisfaction' },
-    { value: 2, suffix: 'x', label: 'Average Profit Growth' },
-    { value: 5, suffix: 'yrs', label: 'Proven Track Record' },
-  ]
-  return (
-    <section ref={ref} className="numbers-banner py-12">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {numbers.map((n, i) => (
-            <motion.div
-              key={n.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.12, duration: 0.6 }}
-            >
-              <p className="text-4xl md:text-5xl font-light text-[#c9a86c] mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                <AnimatedCounter end={n.value} suffix={n.suffix} />
-              </p>
-              <p className="text-[#e8dcc8]/40 text-xs tracking-[0.2em] uppercase">{n.label}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
 
 // ─── 9. Social Proof Logos ───
 function SocialProofSection() {
@@ -2654,7 +2622,7 @@ export default function App() {
         <HeroSection />
         <SocialProofSection />
         <AboutSection />
-        <NumbersBanner />
+
         <ServicesSection />
         <CaseStudiesSection />
         <FounderSection />
