@@ -2221,14 +2221,14 @@ function ContactSection() {
               <p className="text-[#c9a86c] text-xs uppercase tracking-widest mb-1">1st Consultation</p>
               <p className="text-2xl text-[#f5f0e8] font-light">FREE</p>
             </div>
-            <div className="p-4 border border-[#c9a86c]/10 bg-[#0a0908] min-w-[200px]">
+            {/* <div className="p-4 border border-[#c9a86c]/10 bg-[#0a0908] min-w-[200px]">
               <p className="text-[#c9a86c]/60 text-xs uppercase tracking-widest mb-1">2nd Online</p>
               <p className="text-2xl text-[#f5f0e8] font-light">₹999</p>
             </div>
             <div className="p-4 border border-[#c9a86c]/10 bg-[#0a0908] min-w-[200px]">
               <p className="text-[#c9a86c]/60 text-xs uppercase tracking-widest mb-1">2nd Offline</p>
               <p className="text-2xl text-[#f5f0e8] font-light">₹1799</p>
-            </div>
+            </div> */}
           </motion.div>
         </motion.div>
 
@@ -2241,13 +2241,22 @@ function ContactSection() {
           >
             <div className="flex gap-4 mb-8">
               <button
-                onClick={() => setMode('online')}
+                type="button"
+                onClick={() => { 
+                  setMode('online'); 
+                  setTimeSlot(''); 
+                }}
                 className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'online' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
               >
                 Online
               </button>
               <button
-                onClick={() => setMode('offline')}
+                type="button"
+                onClick={() => { 
+                  setMode('offline'); 
+                  setInPune(true); 
+                  setTimeSlot(''); 
+                }}
                 className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'offline' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
               >
                 Offline
@@ -2335,6 +2344,7 @@ function ContactSection() {
                               onChange={() => {
                                 setInPune(false);
                                 setMode('online');
+                                setTimeSlot('');
                               }}
                               checked={!inPune}
                               className="accent-[#c9a86c]"
