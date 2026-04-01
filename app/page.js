@@ -2394,6 +2394,9 @@ function ContactSection() {
                 onClick={() => {
                   setMode('online');
                   setTimeSlot('');
+                  setOtpStep(false);
+                  setOtpError('');
+                  setVerifyingOtp(false);
                 }}
                 className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'online' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
               >
@@ -2405,6 +2408,9 @@ function ContactSection() {
                   setMode('offline');
                   setInPune(true);
                   setTimeSlot('');
+                  setOtpStep(false);
+                  setOtpError('');
+                  setVerifyingOtp(false);
                 }}
                 className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'offline' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
               >
