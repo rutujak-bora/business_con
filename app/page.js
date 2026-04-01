@@ -1494,13 +1494,46 @@ function ServicesSection() {
       centered: true,
       customContent: (
         <div className="text-center space-y-4 py-6 mt-4 flex flex-col items-center">
-          <p className="text-xl md:text-2xl text-[#c9a86c] italic font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Right from registering your business</p>
-          <div className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"></div>
-          <p className="text-xl md:text-2xl text-[#f5f0e8] font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>To making your business grow</p>
-          <div className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"></div>
-          <p className="text-xl md:text-2xl text-[#c9a86c] italic font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>To execute all the plans</p>
-          <div className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"></div>
-          <p className="text-xl md:text-2xl text-[#f5f0e8] font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Turning your dreams into reality</p>
+          <motion.p 
+            variants={fadeInUp}
+            className="text-xl md:text-2xl text-[#c9a86c] italic font-light" 
+            style={{ fontFamily: 'Cormorant Garamond, serif' }}
+          >
+            Right from registering your business
+          </motion.p>
+          <motion.div 
+            variants={fadeInUp}
+            className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"
+          ></motion.div>
+          <motion.p 
+            variants={fadeInUp}
+            className="text-xl md:text-2xl text-[#f5f0e8] font-light" 
+            style={{ fontFamily: 'Cormorant Garamond, serif' }}
+          >
+            To making your business grow
+          </motion.p>
+          <motion.div 
+            variants={fadeInUp}
+            className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"
+          ></motion.div>
+          <motion.p 
+            variants={fadeInUp}
+            className="text-xl md:text-2xl text-[#c9a86c] italic font-light" 
+            style={{ fontFamily: 'Cormorant Garamond, serif' }}
+          >
+            To execute all the plans
+          </motion.p>
+          <motion.div 
+            variants={fadeInUp}
+            className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"
+          ></motion.div>
+          <motion.p 
+            variants={fadeInUp}
+            className="text-xl md:text-2xl text-[#f5f0e8] font-light" 
+            style={{ fontFamily: 'Cormorant Garamond, serif' }}
+          >
+            Turning your dreams into reality
+          </motion.p>
         </div>
       )
     }
@@ -1556,33 +1589,50 @@ function ServicesSection() {
                         <h3 className="text-2xl text-[#f5f0e8] mb-4 font-light group-hover:text-[#c9a86c] transition-colors duration-500" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                           {service.title}
                         </h3>
-                        {service.customContent ? service.customContent : (
-                          <>
-                            <p className="text-[#e8dcc8]/50 mb-6 font-light">
-                              {service.description}
-                            </p>
-
-                            <AnimatePresence>
-                              {hoveredIndex === index && (
-                                <motion.div
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: 'auto' }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  transition={{ duration: 0.4 }}
-                                >
-                                  <div className="grid grid-cols-2 gap-3 pt-6 border-t border-[#c9a86c]/10">
-                                    {service.features?.map((feature) => (
-                                      <div key={feature} className="flex items-center gap-2">
-                                        <div className="w-1 h-1 bg-[#c9a86c]"></div>
-                                        <span className="text-xs text-[#e8dcc8]/60 tracking-wide">{feature}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </>
+                        {service.description && (
+                          <p className="text-[#e8dcc8]/50 mb-6 font-light">
+                            {service.description}
+                          </p>
                         )}
+
+                        <AnimatePresence mode="wait">
+                          {hoveredIndex === index && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                              className="overflow-hidden"
+                            >
+                              {service.customContent ? (
+                                <motion.div
+                                  initial="hidden"
+                                  animate="visible"
+                                  variants={{
+                                    hidden: { opacity: 0 },
+                                    visible: {
+                                      opacity: 1,
+                                      transition: {
+                                        staggerChildren: 0.15
+                                      }
+                                    }
+                                  }}
+                                >
+                                  {service.customContent}
+                                </motion.div>
+                              ) : (
+                                <div className="grid grid-cols-2 gap-3 pt-6 border-t border-[#c9a86c]/10">
+                                  {service.features?.map((feature) => (
+                                    <div key={feature} className="flex items-center gap-2">
+                                      <div className="w-1 h-1 bg-[#c9a86c]"></div>
+                                      <span className="text-xs text-[#e8dcc8]/60 tracking-wide">{feature}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </div>
                   </CardContent>
@@ -2174,13 +2224,13 @@ function InsightsSection() {
 function ContactSection() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const [formData, setFormData] = useState({ 
-    name: '', 
-    email: '', 
-    phone: '', 
-    company: '', 
-    problems: '', 
-    servicesLookingFor: '', 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    problems: '',
+    servicesLookingFor: '',
     timeSlot: '',
     marketingDone: '', // 'yes' or 'no'
     marketingExpectations: '',
@@ -2245,7 +2295,7 @@ function ContactSection() {
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault()
-    
+
     if (!otpStep) {
       await handleSendOtp()
       return
@@ -2281,7 +2331,7 @@ function ContactSection() {
 
       if (response.ok) {
         setSubmitted(true)
-        setFormData({ 
+        setFormData({
           name: '', email: '', phone: '', company: '', problems: '', servicesLookingFor: '', timeSlot: '',
           marketingDone: '', marketingExpectations: '', marketingBudget: '', expectationsMet: '', whatWentWrong: ''
         })
@@ -2341,9 +2391,9 @@ function ContactSection() {
             <div className="flex gap-4 mb-8">
               <button
                 type="button"
-                onClick={() => { 
-                  setMode('online'); 
-                  setTimeSlot(''); 
+                onClick={() => {
+                  setMode('online');
+                  setTimeSlot('');
                 }}
                 className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'online' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
               >
@@ -2351,10 +2401,10 @@ function ContactSection() {
               </button>
               <button
                 type="button"
-                onClick={() => { 
-                  setMode('offline'); 
-                  setInPune(true); 
-                  setTimeSlot(''); 
+                onClick={() => {
+                  setMode('offline');
+                  setInPune(true);
+                  setTimeSlot('');
                 }}
                 className={`flex-1 py-4 text-xs tracking-[0.2em] uppercase border transition-all ${mode === 'offline' ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]' : 'text-[#c9a86c] border-[#c9a86c]/20 hover:border-[#c9a86c]/40'}`}
               >
@@ -2400,30 +2450,30 @@ function ContactSection() {
                               value={otpValue}
                               onChange={(value) => setOtpValue(value)}
                             >
-                                <InputOTPGroup className="gap-2">
-                                  {[0, 1, 2, 3, 4, 5].map((index) => (
-                                    <InputOTPSlot 
-                                      key={index} 
-                                      index={index}
-                                      className="w-10 h-12 md:w-12 md:h-14 border-[#c9a86c]/20 text-[#f5f0e8] text-xl rounded-none bg-transparent"
-                                    />
-                                  ))}
-                                </InputOTPGroup>
+                              <InputOTPGroup className="gap-2">
+                                {[0, 1, 2, 3, 4, 5].map((index) => (
+                                  <InputOTPSlot
+                                    key={index}
+                                    index={index}
+                                    className="w-10 h-12 md:w-12 md:h-14 border-[#c9a86c]/20 text-[#f5f0e8] text-xl rounded-none bg-transparent"
+                                  />
+                                ))}
+                              </InputOTPGroup>
                             </InputOTP>
                           </div>
                           {otpError && <p className="text-red-500 text-xs mt-2">{otpError}</p>}
                         </div>
 
                         <div className="flex flex-col gap-4">
-                          <Button 
+                          <Button
                             type="button"
-                            onClick={handleSubmit} 
+                            onClick={handleSubmit}
                             disabled={verifyingOtp || otpValue.length < 6}
                             className="bg-[#c9a86c] hover:bg-[#b8956d] text-[#0a0908] rounded-none py-6 h-auto tracking-widest uppercase text-xs"
                           >
                             {verifyingOtp ? "Verifying..." : "Confirm Meeting"}
                           </Button>
-                          <button 
+                          <button
                             type="button"
                             onClick={() => setOtpStep(false)}
                             className="text-[#c9a86c]/40 text-[10px] uppercase tracking-[0.2em] hover:text-[#c9a86c] transition-colors"
