@@ -40,8 +40,15 @@ import {
   BarChart3,
   Heart,
   Plus,
-  Minus
+  Minus,
+  MessageSquare,
+  Lock
 } from 'lucide-react'
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 
 // Logo URL
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_strategy-hub-121/artifacts/4s9xy1pp_image.png"
@@ -2167,13 +2174,30 @@ function InsightsSection() {
 function ContactSection() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', company: '', problems: '', servicesLookingFor: '', timeSlot: '' })
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    email: '', 
+    phone: '', 
+    company: '', 
+    problems: '', 
+    servicesLookingFor: '', 
+    timeSlot: '',
+    marketingDone: '', // 'yes' or 'no'
+    marketingExpectations: '',
+    marketingBudget: '',
+    expectationsMet: '',
+    whatWentWrong: ''
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [mode, setMode] = useState('online') // online or offline
   const [inPune, setInPune] = useState(true)
   const [timeSlot, setTimeSlot] = useState('')
   const [bookedSlots, setBookedSlots] = useState([])
+  const [otpStep, setOtpStep] = useState(false)
+  const [otpValue, setOtpValue] = useState('')
+  const [verifyingOtp, setVerifyingOtp] = useState(false)
+  const [otpError, setOtpError] = useState('')
 
   useEffect(() => {
     const fetchBookedSlots = async () => {
@@ -2192,11 +2216,63 @@ function ContactSection() {
     fetchBookedSlots()
   }, [])
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleSendOtp = async () => {
+    if (!formData.phone || formData.phone.length < 10) {
+      alert("Please enter a valid phone number")
+      return
+    }
 
+    setIsSubmitting(true)
     try {
+      const response = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone })
+      })
+      if (response.ok) {
+        setOtpStep(true)
+        setOtpError('')
+      } else {
+        const err = await response.json()
+        alert(err.error || "Failed to send OTP")
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault()
+    
+    if (!otpStep) {
+      await handleSendOtp()
+      return
+    }
+
+    if (otpValue.length < 6) {
+      setOtpError("Please enter the 6-digit OTP")
+      return
+    }
+
+    setVerifyingOtp(true)
+    try {
+      // 1. Verify OTP
+      const otpRes = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone, otp: otpValue })
+      })
+
+      if (!otpRes.ok) {
+        const err = await otpRes.json()
+        setOtpError(err.error || "Invalid OTP")
+        setVerifyingOtp(false)
+        return
+      }
+
+      // 2. Submit Form
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2205,12 +2281,17 @@ function ContactSection() {
 
       if (response.ok) {
         setSubmitted(true)
-        setFormData({ name: '', email: '', phone: '', company: '', problems: '', servicesLookingFor: '', timeSlot: '' })
+        setFormData({ 
+          name: '', email: '', phone: '', company: '', problems: '', servicesLookingFor: '', timeSlot: '',
+          marketingDone: '', marketingExpectations: '', marketingBudget: '', expectationsMet: '', whatWentWrong: ''
+        })
+        setOtpStep(false)
+        setOtpValue('')
       }
     } catch (error) {
-      console.error('Error submitting form:', error)
+      console.error('Error in verification flow:', error)
     } finally {
-      setIsSubmitting(false)
+      setVerifyingOtp(false)
     }
   }
 
@@ -2292,166 +2373,308 @@ function ContactSection() {
                     <div className="w-16 h-16 border border-[#c9a86c]/30 flex items-center justify-center mx-auto mb-6">
                       <CheckCircle className="text-[#c9a86c]" size={32} />
                     </div>
-                    <h3 className="text-2xl text-[#f5f0e8] mb-3 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Request Sent</h3>
+                    <h3 className="text-2xl text-[#f5f0e8] mb-3 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Meeting Confirmed</h3>
                     <p className="text-[#e8dcc8]/50 font-light">
                       {mode === 'online'
-                        ? "We’ll be in touch with you in the next few hours to confirm your slot via email."
-                        : "We’ll be in touch with you in the next few hours to confirm your slot via phone call."}
+                        ? "Thank you! Your meeting is confirmed. We’ll be in touch in the next few hours with the meeting link."
+                        : "Thank you! Your meeting is confirmed. We’ll be in touch in the next few hours to confirm the location."}
                     </p>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    <p className="text-[#c9a86c] text-sm italic mb-6">
-                      {mode === 'online' ? "Let's have a virtual coffee chat" : "Meet us in person. Let's talk strategy over a coffee"}
-                    </p>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Name</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          required
-                          className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
-                          placeholder="Your name"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          value={formData.phone || ''}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          required
-                          className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
-                          placeholder="Your phone"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="company" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Company</Label>
-                      <Input
-                        id="company"
-                        value={formData.company}
-                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
-                        placeholder="Your organization"
-                      />
-                    </div>
-
-                    {mode === 'offline' && (
-                      <div className="flex items-center gap-4 p-4 border border-[#c9a86c]/10 bg-[#c9a86c]/5">
-                        <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Are you based in पुणे (Pune)?</Label>
-                        <div className="flex gap-4">
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="radio"
-                              name="pune"
-                              onChange={() => setInPune(true)}
-                              checked={inPune}
-                              className="accent-[#c9a86c]"
-                            />
-                            <span className="text-xs text-[#f5f0e8]">Yes</span>
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="radio"
-                              name="pune"
-                              onChange={() => {
-                                setInPune(false);
-                                setMode('online');
-                                setTimeSlot('');
-                              }}
-                              checked={!inPune}
-                              className="accent-[#c9a86c]"
-                            />
-                            <span className="text-xs text-[#f5f0e8]">No</span>
-                          </label>
+                    {otpStep ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-8 py-10 text-center"
+                      >
+                        <div className="space-y-4">
+                          <div className="w-12 h-12 border border-[#c9a86c]/30 flex items-center justify-center mx-auto mb-4">
+                            <Lock className="text-[#c9a86c]" size={20} />
+                          </div>
+                          <Label className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase">Verify OTP</Label>
+                          <p className="text-[#e8dcc8]/50 text-sm font-light">Enter the 6-digit code sent to {formData.phone}</p>
+                          <div className="flex justify-center pt-4">
+                            <InputOTP
+                              maxLength={6}
+                              value={otpValue}
+                              onChange={(value) => setOtpValue(value)}
+                            >
+                                <InputOTPGroup className="gap-2">
+                                  {[0, 1, 2, 3, 4, 5].map((index) => (
+                                    <InputOTPSlot 
+                                      key={index} 
+                                      index={index}
+                                      className="w-10 h-12 md:w-12 md:h-14 border-[#c9a86c]/20 text-[#f5f0e8] text-xl rounded-none bg-transparent"
+                                    />
+                                  ))}
+                                </InputOTPGroup>
+                            </InputOTP>
+                          </div>
+                          {otpError && <p className="text-red-500 text-xs mt-2">{otpError}</p>}
                         </div>
-                      </div>
-                    )}
 
-                    <div className="space-y-2">
-                      <Label htmlFor="problems" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What problems are you facing?</Label>
-                      <Textarea
-                        id="problems"
-                        value={formData.problems || ''}
-                        onChange={(e) => setFormData({ ...formData, problems: e.target.value })}
-                        required
-                        className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none resize-none"
-                        placeholder="Describe your challenges"
-                      />
-                    </div>
+                        <div className="flex flex-col gap-4">
+                          <Button 
+                            type="button"
+                            onClick={handleSubmit} 
+                            disabled={verifyingOtp || otpValue.length < 6}
+                            className="bg-[#c9a86c] hover:bg-[#b8956d] text-[#0a0908] rounded-none py-6 h-auto tracking-widest uppercase text-xs"
+                          >
+                            {verifyingOtp ? "Verifying..." : "Confirm Meeting"}
+                          </Button>
+                          <button 
+                            type="button"
+                            onClick={() => setOtpStep(false)}
+                            className="text-[#c9a86c]/40 text-[10px] uppercase tracking-[0.2em] hover:text-[#c9a86c] transition-colors"
+                          >
+                            Change Phone Number
+                          </button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <>
+                        <p className="text-[#c9a86c] text-sm italic mb-6">
+                          {mode === 'online' ? "Let's have a virtual coffee chat" : "Meet us in person. Let's talk strategy over a coffee"}
+                        </p>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="services" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What services are you looking for?</Label>
-                      <Input
-                        id="services"
-                        value={formData.servicesLookingFor || ''}
-                        onChange={(e) => setFormData({ ...formData, servicesLookingFor: e.target.value })}
-                        required
-                        className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
-                        placeholder="e.g. Digital Marketing, Franchise"
-                      />
-                    </div>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="name" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Name*</Label>
+                            <Input
+                              id="name"
+                              value={formData.name}
+                              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                              required
+                              className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
+                              placeholder="Your name"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="phone" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Phone Number*</Label>
+                            <Input
+                              id="phone"
+                              value={formData.phone || ''}
+                              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                              required
+                              className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
+                              placeholder="Your phone"
+                            />
+                          </div>
+                        </div>
 
-                    <div className="space-y-4">
-                      <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Select a time when you are available:</Label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {mode === 'online' ? (
-                          <>
-                            {['10:30 am - 11:30 am', '11:30 am - 12:30 pm', '12:30 pm - 1:30 pm', '3:00 pm - 4:00 pm', '4:00 pm - 5:00 pm', '5:00 pm - 6:00 pm'].map((slot) => {
-                              const isBooked = bookedSlots.includes(slot)
-                              return (
-                                <button
-                                  key={slot}
-                                  type="button"
-                                  disabled={isBooked}
-                                  onClick={() => setTimeSlot(slot)}
-                                  className={`p-4 text-xs tracking-widest border transition-all relative ${isBooked ? 'bg-[#ff4444]/5 border-[#ff4444]/20 text-[#ff4444]/50 cursor-not-allowed' : timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
-                                >
-                                  {slot}
-                                  {isBooked && (
-                                    <span className="absolute bottom-1 right-2 text-[9px] uppercase tracking-wider text-[#ff4444]/80 font-bold">Booked</span>
-                                  )}
-                                </button>
-                              )
-                            })}
-                          </>
-                        ) : (
-                          <>
-                            {['11 am - 12 pm', '12 pm - 1 pm', '1 pm - 2 pm', '3 pm - 4 pm', '4 pm - 5 pm', '5:30 pm - 6:30 pm', '6:30 pm - 7:30 pm', '7:30 pm - 8:30 pm'].map((slot) => {
-                              const isBooked = bookedSlots.includes(slot)
-                              return (
-                                <button
-                                  key={slot}
-                                  type="button"
-                                  disabled={isBooked}
-                                  onClick={() => setTimeSlot(slot)}
-                                  className={`p-4 text-xs tracking-widest border transition-all relative ${isBooked ? 'bg-[#ff4444]/5 border-[#ff4444]/20 text-[#ff4444]/50 cursor-not-allowed' : timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
-                                >
-                                  {slot}
-                                  {isBooked && (
-                                    <span className="absolute bottom-1 right-2 text-[9px] uppercase tracking-wider text-[#ff4444]/80 font-bold">Booked</span>
-                                  )}
-                                </button>
-                              )
-                            })}
-                          </>
+                        <div className="space-y-2">
+                          <Label htmlFor="company" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Company*</Label>
+                          <Input
+                            id="company"
+                            value={formData.company}
+                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                            required
+                            className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
+                            placeholder="Your organization"
+                          />
+                        </div>
+
+                        {/* Marketing Question */}
+                        <div className="space-y-4 pt-2">
+                          <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Have you ever done marketing before?*</Label>
+                          <div className="flex gap-8">
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                              <input
+                                type="radio"
+                                name="marketingDone"
+                                onChange={() => setFormData({ ...formData, marketingDone: 'yes' })}
+                                checked={formData.marketingDone === 'yes'}
+                                required
+                                className="accent-[#c9a86c] w-4 h-4"
+                              />
+                              <span className="text-sm text-[#f5f0e8] group-hover:text-[#c9a86c] transition-colors">Yes</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                              <input
+                                type="radio"
+                                name="marketingDone"
+                                onChange={() => setFormData({ ...formData, marketingDone: 'no' })}
+                                checked={formData.marketingDone === 'no'}
+                                required
+                                className="accent-[#c9a86c] w-4 h-4"
+                              />
+                              <span className="text-sm text-[#f5f0e8] group-hover:text-[#c9a86c] transition-colors">No</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <AnimatePresence>
+                          {formData.marketingDone === 'yes' && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="space-y-6 overflow-hidden"
+                            >
+                              <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                  <Label htmlFor="expectations" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What were your expectations?*</Label>
+                                  <Input
+                                    id="expectations"
+                                    value={formData.marketingExpectations}
+                                    onChange={(e) => setFormData({ ...formData, marketingExpectations: e.target.value })}
+                                    required={formData.marketingDone === 'yes'}
+                                    className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
+                                    placeholder="What were you hoping for?"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="budget" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What was your marketing budget?*</Label>
+                                  <Input
+                                    id="budget"
+                                    value={formData.marketingBudget}
+                                    onChange={(e) => setFormData({ ...formData, marketingBudget: e.target.value })}
+                                    required={formData.marketingDone === 'yes'}
+                                    className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
+                                    placeholder="Budget range"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="met" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Did they meet your expectations?*</Label>
+                                <Input
+                                  id="met"
+                                  value={formData.expectationsMet}
+                                  onChange={(e) => setFormData({ ...formData, expectationsMet: e.target.value })}
+                                  required={formData.marketingDone === 'yes'}
+                                  className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
+                                  placeholder="Yes/No and why?"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="wrong" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What you wanted them to deliver on and what went wrong?*</Label>
+                                <Textarea
+                                  id="wrong"
+                                  value={formData.whatWentWrong}
+                                  onChange={(e) => setFormData({ ...formData, whatWentWrong: e.target.value })}
+                                  required={formData.marketingDone === 'yes'}
+                                  className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none resize-none"
+                                  placeholder="Share your experience"
+                                />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        {mode === 'offline' && (
+                          <div className="flex items-center gap-4 p-4 border border-[#c9a86c]/10 bg-[#c9a86c]/5">
+                            <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Are you based in पुणे (Pune)?</Label>
+                            <div className="flex gap-4">
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name="pune"
+                                  onChange={() => setInPune(true)}
+                                  checked={inPune}
+                                  className="accent-[#c9a86c]"
+                                />
+                                <span className="text-xs text-[#f5f0e8]">Yes</span>
+                              </label>
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name="pune"
+                                  onChange={() => {
+                                    setInPune(false);
+                                    setMode('online');
+                                    setTimeSlot('');
+                                  }}
+                                  checked={!inPune}
+                                  className="accent-[#c9a86c]"
+                                />
+                                <span className="text-xs text-[#f5f0e8]">No</span>
+                              </label>
+                            </div>
+                          </div>
                         )}
-                      </div>
-                    </div>
 
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting || (mode === 'offline' && !inPune)}
-                      className="w-full bg-[#c9a86c] hover:bg-[#b8956d] text-[#0a0908] rounded-none py-6 group text-xs tracking-wider uppercase"
-                    >
-                      {isSubmitting ? 'Scheduling...' : 'Book My Free Consultation'}
-                      <Send className="ml-2 group-hover:translate-x-1 transition-transform" size={14} />
-                    </Button>
+                        <div className="space-y-2">
+                          <Label htmlFor="problems" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What problems are you facing?*</Label>
+                          <Textarea
+                            id="problems"
+                            value={formData.problems || ''}
+                            onChange={(e) => setFormData({ ...formData, problems: e.target.value })}
+                            required
+                            className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none resize-none"
+                            placeholder="Describe your challenges"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="services" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What services are you looking for?*</Label>
+                          <Input
+                            id="services"
+                            value={formData.servicesLookingFor || ''}
+                            onChange={(e) => setFormData({ ...formData, servicesLookingFor: e.target.value })}
+                            required
+                            className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
+                            placeholder="e.g. Digital Marketing, Franchise"
+                          />
+                        </div>
+
+                        <div className="space-y-4">
+                          <Label className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Select a time when you are available:*</Label>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {mode === 'online' ? (
+                              <>
+                                {['10:30 am - 11:30 am', '11:30 am - 12:30 pm', '12:30 pm - 1:30 pm', '3:00 pm - 4:00 pm', '4:00 pm - 5:00 pm', '5:00 pm - 6:00 pm'].map((slot) => {
+                                  const isBooked = bookedSlots.includes(slot)
+                                  return (
+                                    <button
+                                      key={slot}
+                                      type="button"
+                                      disabled={isBooked}
+                                      onClick={() => setTimeSlot(slot)}
+                                      className={`p-4 text-xs tracking-widest border transition-all relative ${isBooked ? 'bg-[#ff4444]/5 border-[#ff4444]/20 text-[#ff4444]/50 cursor-not-allowed' : timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
+                                    >
+                                      {slot}
+                                      {isBooked && (
+                                        <span className="absolute bottom-1 right-2 text-[9px] uppercase tracking-wider text-[#ff4444]/80 font-bold">Booked</span>
+                                      )}
+                                    </button>
+                                  )
+                                })}
+                              </>
+                            ) : (
+                              <>
+                                {['11 am - 12 pm', '12 pm - 1 pm', '1 pm - 2 pm', '3 pm - 4 pm', '4 pm - 5 pm', '5:30 pm - 6:30 pm', '6:30 pm - 7:30 pm', '7:30 pm - 8:30 pm'].map((slot) => {
+                                  const isBooked = bookedSlots.includes(slot)
+                                  return (
+                                    <button
+                                      key={slot}
+                                      type="button"
+                                      disabled={isBooked}
+                                      onClick={() => setTimeSlot(slot)}
+                                      className={`p-4 text-xs tracking-widest border transition-all relative ${isBooked ? 'bg-[#ff4444]/5 border-[#ff4444]/20 text-[#ff4444]/50 cursor-not-allowed' : timeSlot === slot ? 'bg-[#c9a86c]/20 border-[#c9a86c] text-[#f5f0e8]' : 'border-[#c9a86c]/10 text-[#e8dcc8]/40 hover:border-[#c9a86c]/30'}`}
+                                    >
+                                      {slot}
+                                      {isBooked && (
+                                        <span className="absolute bottom-1 right-2 text-[9px] uppercase tracking-wider text-[#ff4444]/80 font-bold">Booked</span>
+                                      )}
+                                    </button>
+                                  )
+                                })}
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting || (mode === 'offline' && !inPune) || !timeSlot}
+                          className="w-full bg-[#c9a86c] hover:bg-[#b8956d] text-[#0a0908] rounded-none py-6 h-auto group text-xs tracking-wider uppercase"
+                        >
+                          {isSubmitting ? 'Sending Request...' : 'Schedule Meeting'}
+                          <Send className="ml-2 group-hover:translate-x-1 transition-transform" size={14} />
+                        </Button>
+                      </>
+                    )}
                   </form>
                 )}
               </CardContent>

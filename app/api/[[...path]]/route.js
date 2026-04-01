@@ -95,9 +95,67 @@ export async function POST(request, { params }) {
     const endpoint = path.join('/')
     const body = await request.json()
 
+    // Send OTP
+    if (endpoint === 'send-otp') {
+      const { phone } = body
+      if (!phone) {
+        return jsonResponse({ error: 'Phone number is required' }, 400)
+      }
+
+      const database = await getDb()
+      const otp = Math.floor(100000 + Math.random() * 900000).toString()
+      
+      // Store OTP in database
+      await database.collection('otps').updateOne(
+        { phone },
+        { $set: { otp, createdAt: new Date() } },
+        { upsert: true }
+      )
+
+      // In a real app, you would call an SMS API here (like Twilio or Msg91)
+      console.log(`OTP for ${phone}: ${otp}`)
+      
+      return jsonResponse({ success: true, message: 'OTP sent successfully' })
+    }
+
+    // Verify OTP
+    if (endpoint === 'verify-otp') {
+      const { phone, otp } = body
+      if (!phone || !otp) {
+        return jsonResponse({ error: 'Phone and OTP are required' }, 400)
+      }
+
+      const database = await getDb()
+      const record = await database.collection('otps').findOne({ phone })
+
+      if (!record || record.otp !== otp) {
+        return jsonResponse({ error: 'Invalid OTP' }, 400)
+      }
+
+      // Check if OTP is expired (5 minutes)
+      const now = new Date()
+      const otpTime = new Date(record.createdAt)
+      const diffMinutes = (now - otpTime) / (1000 * 60)
+
+      if (diffMinutes > 5) {
+        return jsonResponse({ error: 'OTP expired' }, 400)
+      }
+
+      // OTP is valid, remove it
+      await database.collection('otps').deleteOne({ phone })
+
+      return jsonResponse({ success: true, message: 'OTP verified successfully' })
+    }
+
     // Contact form submission
     if (endpoint === 'contact') {
-      const { name, email, company, message, phone, problems, servicesLookingFor, mode, inPune, timeSlot } = body
+      const { 
+        name, email, phone, company, 
+        problems, servicesLookingFor, 
+        mode, inPune, timeSlot,
+        marketingDone, marketingExpectations, marketingBudget, 
+        expectationsMet, whatWentWrong 
+      } = body
 
       if (!name || !email) {
         return jsonResponse({ error: 'Name and email are required' }, 400)
@@ -118,17 +176,22 @@ export async function POST(request, { params }) {
         email,
         phone: phone || '',
         company: company || '',
-        message: message || problems || '',
+        message: problems || '',
         servicesLookingFor: servicesLookingFor || '',
         mode: mode || 'online',
         inPune: inPune !== undefined ? inPune : true,
         timeSlot: timeSlot || '',
+        marketingDone: marketingDone || '',
+        marketingExpectations: marketingExpectations || '',
+        marketingBudget: marketingBudget || '',
+        expectationsMet: expectationsMet || '',
+        whatWentWrong: whatWentWrong || '',
         status: 'new',
         createdAt: new Date().toISOString()
       }
 
       await database.collection('contacts').insertOne(contact)
-      return jsonResponse({ success: true, message: 'Contact form submitted successfully', data: contact }, 201)
+      return jsonResponse({ success: true, message: 'Meeting confirmed and contact form submitted successfully', data: contact }, 201)
     }
 
     // Newsletter subscription
