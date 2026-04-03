@@ -54,6 +54,7 @@ import {
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_strategy-hub-121/artifacts/4s9xy1pp_image.png"
 
 // ─── 1. Custom Gold Cursor + Sound ───
+// ─── 1. Custom Gold Cursor + Sound ───
 function CustomCursor({ muted }) {
   const dotRef = useRef(null)
   const ringRef = useRef(null)
@@ -76,11 +77,11 @@ function CustomCursor({ muted }) {
     return audioCtxRef.current
   }
 
-  // Soft tick on movement (very quiet, high-freq click)
+  // Soft tick on movement
   const playMoveTick = () => {
     if (mutedRef.current) return
     const now = performance.now()
-    if (now - lastSoundTime.current < 80) return   // throttle: max ~12× per sec
+    if (now - lastSoundTime.current < 80) return
     lastSoundTime.current = now
     try {
       const ctx = getCtx()
@@ -98,12 +99,10 @@ function CustomCursor({ muted }) {
     } catch (_) { }
   }
 
-  // Crisp click on mousedown
   const playClickDown = () => {
     if (mutedRef.current) return
     try {
       const ctx = getCtx()
-      // Noise burst for mechanical click feel
       const bufferSize = ctx.sampleRate * 0.04
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
       const data = buffer.getChannelData(0)
@@ -125,7 +124,6 @@ function CustomCursor({ muted }) {
     } catch (_) { }
   }
 
-  // Soft release on mouseup
   const playClickUp = () => {
     if (mutedRef.current) return
     try {
@@ -150,20 +148,34 @@ function CustomCursor({ muted }) {
     const ring = ringRef.current
     if (!dot || !ring) return
 
+    // Hide system cursor globally on desktop
+    document.body.style.cursor = 'none'
+
     const move = (e) => {
       const dx = e.clientX - lastPos.current.x
       const dy = e.clientY - lastPos.current.y
       const speed = Math.sqrt(dx * dx + dy * dy)
       pos.current = { x: e.clientX, y: e.clientY }
-      if (speed > 4) {          // only sound on meaningful movement
+      if (speed > 4) {
         playMoveTick()
       }
       lastPos.current = { x: e.clientX, y: e.clientY }
+
+      // Event delegation for hover states
+      const target = e.target
+      if (target.closest('a, button, [role="button"], input, textarea, label, select')) {
+        ring.classList.add('cursor-hover')
+      } else {
+        ring.classList.remove('cursor-hover')
+      }
     }
 
+    const handleMouseDown = () => playClickDown()
+    const handleMouseUp = () => playClickUp()
+
     window.addEventListener('mousemove', move)
-    window.addEventListener('mousedown', playClickDown)
-    window.addEventListener('mouseup', playClickUp)
+    window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mouseup', handleMouseUp)
 
     const animate = () => {
       ringPos.current.x += (pos.current.x - ringPos.current.x) * 0.12
@@ -176,19 +188,13 @@ function CustomCursor({ muted }) {
     }
     rafRef.current = requestAnimationFrame(animate)
 
-    const enter = () => ring.classList.add('cursor-hover')
-    const leave = () => ring.classList.remove('cursor-hover')
-    document.querySelectorAll('a,button,[role=button]').forEach(el => {
-      el.addEventListener('mouseenter', enter)
-      el.addEventListener('mouseleave', leave)
-    })
-
     return () => {
       window.removeEventListener('mousemove', move)
-      window.removeEventListener('mousedown', playClickDown)
-      window.removeEventListener('mouseup', playClickUp)
+      window.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('mouseup', handleMouseUp)
       cancelAnimationFrame(rafRef.current)
       if (audioCtxRef.current) audioCtxRef.current.close()
+      document.body.style.cursor = 'auto'
     }
   }, [])
 
@@ -1494,42 +1500,42 @@ function ServicesSection() {
       centered: true,
       customContent: (
         <div className="text-center space-y-4 py-6 mt-4 flex flex-col items-center">
-          <motion.p 
+          <motion.p
             variants={fadeInUp}
-            className="text-xl md:text-2xl text-[#c9a86c] italic font-light" 
+            className="text-xl md:text-2xl text-[#c9a86c] italic font-light"
             style={{ fontFamily: 'Cormorant Garamond, serif' }}
           >
             Right from registering your business
           </motion.p>
-          <motion.div 
+          <motion.div
             variants={fadeInUp}
             className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"
           ></motion.div>
-          <motion.p 
+          <motion.p
             variants={fadeInUp}
-            className="text-xl md:text-2xl text-[#f5f0e8] font-light" 
+            className="text-xl md:text-2xl text-[#f5f0e8] font-light"
             style={{ fontFamily: 'Cormorant Garamond, serif' }}
           >
             To making your business grow
           </motion.p>
-          <motion.div 
+          <motion.div
             variants={fadeInUp}
             className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"
           ></motion.div>
-          <motion.p 
+          <motion.p
             variants={fadeInUp}
-            className="text-xl md:text-2xl text-[#c9a86c] italic font-light" 
+            className="text-xl md:text-2xl text-[#c9a86c] italic font-light"
             style={{ fontFamily: 'Cormorant Garamond, serif' }}
           >
             To execute all the plans
           </motion.p>
-          <motion.div 
+          <motion.div
             variants={fadeInUp}
             className="w-px h-8 bg-gradient-to-b from-[#c9a86c]/50 to-transparent my-2"
           ></motion.div>
-          <motion.p 
+          <motion.p
             variants={fadeInUp}
-            className="text-xl md:text-2xl text-[#f5f0e8] font-light" 
+            className="text-xl md:text-2xl text-[#f5f0e8] font-light"
             style={{ fontFamily: 'Cormorant Garamond, serif' }}
           >
             Turning your dreams into reality

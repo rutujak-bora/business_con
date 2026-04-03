@@ -93,6 +93,17 @@ html {
   box-sizing: border-box;
 }
 
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  
+  /* Ensure all interactive elements inherit the hidden cursor to avoid flickering */
+  a, button, input, textarea, label {
+    cursor: none !important;
+  }
+}
+
 body {
   font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
   background: hsl(var(--background));
