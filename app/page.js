@@ -163,10 +163,19 @@ function CustomCursor({ muted }) {
 
       // Event delegation for hover states
       const target = e.target
-      if (target.closest('a, button, [role="button"], input, textarea, label, select')) {
-        ring.classList.add('cursor-hover')
+      const isInput = target.closest('input, textarea, select, [role="combobox"]')
+      
+      if (isInput) {
+        dot.style.opacity = '0'
+        ring.style.opacity = '0'
       } else {
-        ring.classList.remove('cursor-hover')
+        dot.style.opacity = '1'
+        ring.style.opacity = '1'
+        if (target.closest('a, button, [role="button"], label')) {
+          ring.classList.add('cursor-hover')
+        } else {
+          ring.classList.remove('cursor-hover')
+        }
       }
     }
 
@@ -1335,7 +1344,7 @@ function AboutSection() {
             viewport={{ once: true }}
             transition={{ duration: 1 }}
           >
-            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block">What we do at house of persis?</span>
+            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block font-bold">What we do at house of persis?</span>
             <h2 className="text-4xl md:text-5xl text-[#f5f0e8] mb-8 leading-tight font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
               Closing the gap between
               <span className="block text-[#c9a86c]/80 italic">Ambition & Roadmap</span>
@@ -1363,8 +1372,8 @@ function AboutSection() {
             transition={{ duration: 1 }}
             className="order-2 lg:order-1"
           >
-            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block">Why choose house of persis?</span>
-            <p className="text-[#e8dcc8]/60 text-lg mb-6 leading-relaxed font-light font-bold">
+            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block font-bold">Why choose house of persis?</span>
+            <p className="text-[#e8dcc8]/60 text-lg mb-6 leading-relaxed font-bold">
               Because good advice is common. A growth partner is rare.
             </p>
             <p className="text-[#e8dcc8]/50 mb-10 leading-relaxed">
@@ -1376,7 +1385,7 @@ function AboutSection() {
               but the profit growth and customer satisfaction.
             </p>
 
-            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block">Our Story</span>
+            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block font-bold">Our Story</span>
             <p className="text-[#e8dcc8]/50 mb-10 leading-relaxed">
               House of Persis was founded in 2025 with a single, unwavering belief - that every business, regardless of size or stage, deserves the kind of strategic guidance once reserved for the elite. We help businesses start from scratch, right from registration to turning it into a legacy that runs for generations. We don’t just advise - we walk the path of business with you as your growth partner. Our approach is unique. We combine years of knowledge, expertise and experience to fulfill your business expectations.
             </p>

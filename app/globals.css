@@ -98,9 +98,12 @@ html {
     cursor: none;
   }
   
-  /* Ensure all interactive elements inherit the hidden cursor to avoid flickering */
-  a, button, input, textarea, label {
+  a, button, label {
     cursor: none !important;
+  }
+  
+  input, textarea, select {
+    cursor: auto !important;
   }
 }
 
