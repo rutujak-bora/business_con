@@ -147,17 +147,18 @@ export async function POST(request, { params }) {
       return jsonResponse({ success: true, message: 'OTP verified successfully' })
     }
 
-    // Contact form submission
+    // Contact form submission (Standard, Startup, and Investor)
     if (endpoint === 'contact') {
       const { 
-        name, email, phone, company, 
+        name, fullName, email, phone, company, 
         problems, servicesLookingFor, 
         mode, inPune, timeSlot,
         marketingDone, marketingExpectations, marketingBudget, 
-        expectationsMet, whatWentWrong 
+        expectationsMet, whatWentWrong,
+        type, startupName, startupDescription, websiteLink, helpNeeded
       } = body
 
-      if (!name || !email) {
+      if (!(name || fullName) || !email) {
         return jsonResponse({ error: 'Name and email are required' }, 400)
       }
 
@@ -172,7 +173,7 @@ export async function POST(request, { params }) {
 
       const contact = {
         id: uuidv4(),
-        name,
+        name: name || fullName,
         email,
         phone: phone || '',
         company: company || '',
@@ -186,12 +187,23 @@ export async function POST(request, { params }) {
         marketingBudget: marketingBudget || '',
         expectationsMet: expectationsMet || '',
         whatWentWrong: whatWentWrong || '',
+        // New fields for Startup/Investor
+        formType: type || 'standard',
+        startupName: startupName || '',
+        startupDescription: startupDescription || '',
+        websiteLink: websiteLink || '',
+        helpNeeded: helpNeeded || [],
         status: 'new',
         createdAt: new Date().toISOString()
       }
 
       await database.collection('contacts').insertOne(contact)
-      return jsonResponse({ success: true, message: 'Meeting confirmed and contact form submitted successfully', data: contact }, 201)
+
+      // Placeholder for Email Notification
+      // In a real environment, you would use Nodemailer or Resend here.
+      console.log('New Lead Captured:', contact)
+
+      return jsonResponse({ success: true, message: 'Form submitted successfully', data: contact }, 201)
     }
 
     // Newsletter subscription

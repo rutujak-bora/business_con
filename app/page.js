@@ -53,170 +53,8 @@ import {
 // Logo URL
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_strategy-hub-121/artifacts/4s9xy1pp_image.png"
 
-// ─── 1. Custom Gold Cursor + Sound ───
-// ─── 1. Custom Gold Cursor + Sound ───
-function CustomCursor({ muted }) {
-  const dotRef = useRef(null)
-  const ringRef = useRef(null)
-  const pos = useRef({ x: 0, y: 0 })
-  const lastPos = useRef({ x: 0, y: 0 })
-  const ringPos = useRef({ x: 0, y: 0 })
-  const rafRef = useRef(null)
-  const audioCtxRef = useRef(null)
-  const lastSoundTime = useRef(0)
-  const mutedRef = useRef(false)
-
-  // Keep mutedRef in sync with prop
-  useEffect(() => { mutedRef.current = muted }, [muted])
-
-  // ── Web Audio helpers ──────────────────────────────────
-  const getCtx = () => {
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)()
-    }
-    return audioCtxRef.current
-  }
-
-  // Soft tick on movement
-  const playMoveTick = () => {
-    if (mutedRef.current) return
-    const now = performance.now()
-    if (now - lastSoundTime.current < 80) return
-    lastSoundTime.current = now
-    try {
-      const ctx = getCtx()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(1800, ctx.currentTime)
-      osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.025)
-      gain.gain.setValueAtTime(0.018, ctx.currentTime)
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.03)
-      osc.start(ctx.currentTime)
-      osc.stop(ctx.currentTime + 0.03)
-    } catch (_) { }
-  }
-
-  const playClickDown = () => {
-    if (mutedRef.current) return
-    try {
-      const ctx = getCtx()
-      const bufferSize = ctx.sampleRate * 0.04
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
-      const data = buffer.getChannelData(0)
-      for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1)
-      const source = ctx.createBufferSource()
-      source.buffer = buffer
-      const gain = ctx.createGain()
-      const filter = ctx.createBiquadFilter()
-      filter.type = 'bandpass'
-      filter.frequency.value = 2400
-      filter.Q.value = 0.8
-      source.connect(filter)
-      filter.connect(gain)
-      gain.connect(ctx.destination)
-      gain.gain.setValueAtTime(0.22, ctx.currentTime)
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04)
-      source.start(ctx.currentTime)
-      source.stop(ctx.currentTime + 0.04)
-    } catch (_) { }
-  }
-
-  const playClickUp = () => {
-    if (mutedRef.current) return
-    try {
-      const ctx = getCtx()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(600, ctx.currentTime)
-      osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05)
-      gain.gain.setValueAtTime(0.07, ctx.currentTime)
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05)
-      osc.start(ctx.currentTime)
-      osc.stop(ctx.currentTime + 0.05)
-    } catch (_) { }
-  }
-
-  // ── Cursor movement & animation loop ──────────────────
-  useEffect(() => {
-    const dot = dotRef.current
-    const ring = ringRef.current
-    if (!dot || !ring) return
-
-    // Hide system cursor globally on desktop
-    document.body.style.cursor = 'none'
-
-    const move = (e) => {
-      const dx = e.clientX - lastPos.current.x
-      const dy = e.clientY - lastPos.current.y
-      const speed = Math.sqrt(dx * dx + dy * dy)
-      pos.current = { x: e.clientX, y: e.clientY }
-      if (speed > 4) {
-        playMoveTick()
-      }
-      lastPos.current = { x: e.clientX, y: e.clientY }
-
-      // Event delegation for hover states
-      const target = e.target
-      const isInput = target.closest('input, textarea, select, [role="combobox"]')
-
-      if (isInput) {
-        dot.style.opacity = '0'
-        ring.style.opacity = '0'
-      } else {
-        dot.style.opacity = '1'
-        ring.style.opacity = '1'
-        if (target.closest('a, button, [role="button"], label')) {
-          ring.classList.add('cursor-hover')
-        } else {
-          ring.classList.remove('cursor-hover')
-        }
-      }
-    }
-
-    const handleMouseDown = () => playClickDown()
-    const handleMouseUp = () => playClickUp()
-
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mousedown', handleMouseDown)
-    window.addEventListener('mouseup', handleMouseUp)
-
-    const animate = () => {
-      ringPos.current.x += (pos.current.x - ringPos.current.x) * 0.12
-      ringPos.current.y += (pos.current.y - ringPos.current.y) * 0.12
-      dot.style.left = pos.current.x + 'px'
-      dot.style.top = pos.current.y + 'px'
-      ring.style.left = ringPos.current.x + 'px'
-      ring.style.top = ringPos.current.y + 'px'
-      rafRef.current = requestAnimationFrame(animate)
-    }
-    rafRef.current = requestAnimationFrame(animate)
-
-    return () => {
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mousedown', handleMouseDown)
-      window.removeEventListener('mouseup', handleMouseUp)
-      cancelAnimationFrame(rafRef.current)
-      if (audioCtxRef.current) audioCtxRef.current.close()
-      document.body.style.cursor = 'auto'
-    }
-  }, [])
-
-  return (
-    <>
-      <div ref={dotRef} className="cursor-dot" />
-      <div ref={ringRef} className="cursor-ring" />
-    </>
-  )
-}
-
 // ─── Background Ambient Music (Web Audio API — no files needed) ───
-function BackgroundMusic({ cursorMuted, setCursorMuted }) {
+function BackgroundMusic() {
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.18)
   const [showVolume, setShowVolume] = useState(false)
@@ -281,11 +119,11 @@ function BackgroundMusic({ cursorMuted, setCursorMuted }) {
       window.removeEventListener('keydown', handleFirstInteraction)
       window.removeEventListener('touchstart', handleFirstInteraction)
     }
-    
+
     window.addEventListener('click', handleFirstInteraction)
     window.addEventListener('keydown', handleFirstInteraction)
     window.addEventListener('touchstart', handleFirstInteraction)
-    
+
     return () => {
       window.removeEventListener('click', handleFirstInteraction)
       window.removeEventListener('keydown', handleFirstInteraction)
@@ -365,19 +203,6 @@ function BackgroundMusic({ cursorMuted, setCursorMuted }) {
           )}
         </button>
       </div>
-
-      {/* ─── Cursor Sound Toggle (Integrated) ─── */}
-      <button
-        onClick={() => setCursorMuted(m => !m)}
-        title={cursorMuted ? 'Unmute cursor' : 'Mute cursor'}
-        style={{ cursor: 'none' }}
-        className={`w-9 h-9 md:w-11 md:h-11 flex items-center justify-center border backdrop-blur-sm transition-all duration-500 ${!cursorMuted
-          ? 'border-[#c9a86c]/40 bg-[#c9a86c]/5 text-[#c9a86c]'
-          : 'border-[#c9a86c]/20 bg-[#0a0908]/80 text-[#c9a86c]/40 hover:border-[#c9a86c]/40'
-          }`}
-      >
-        <span className="text-[12px] md:text-[14px]">{cursorMuted ? '🔇' : '🖱️'}</span>
-      </button>
     </div>
   )
 }
@@ -2347,8 +2172,8 @@ function StartupSection() {
             </motion.div>
 
             <div className="relative group overflow-hidden">
-              <img 
-                src="/images/image4.png" 
+              <img
+                src="/images/image4.png"
                 alt="Startup Support"
                 className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-1000"
               />
@@ -2509,10 +2334,10 @@ function StartupSection() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">What is your startup?</Label>
+                      <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Venture Mission & Vision</Label>
                       <Textarea
-                        placeholder="Tell us about your mission, product, and progress..."
-                        className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0 h-24 resize-none"
+                        placeholder="Detail your startup's core mission, the problem you're solving, and your current traction or expansion goals..."
+                        className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0 h-32 resize-none"
                         value={formData.startupDescription}
                         onChange={e => setFormData({ ...formData, startupDescription: e.target.value })}
                       />
@@ -2527,8 +2352,8 @@ function StartupSection() {
                             type="button"
                             onClick={() => toggleHelp(type)}
                             className={`p-3 text-[10px] tracking-widest uppercase transition-all border duration-300 ${formData.helpNeeded.includes(type)
-                                ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]'
-                                : 'bg-transparent text-[#e8dcc8]/40 border-[#c9a86c]/20 hover:border-[#c9a86c]/40'
+                              ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]'
+                              : 'bg-transparent text-[#e8dcc8]/40 border-[#c9a86c]/20 hover:border-[#c9a86c]/40'
                               }`}
                           >
                             {type}
@@ -3255,26 +3080,26 @@ function ContactSection() {
                         )}
 
                         <div className="space-y-2">
-                          <Label htmlFor="problems" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What problems are you facing?*</Label>
+                          <Label htmlFor="problems" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Current Landscape & Challenges*</Label>
                           <Textarea
                             id="problems"
                             value={formData.problems || ''}
                             onChange={(e) => setFormData({ ...formData, problems: e.target.value })}
                             required
-                            className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none resize-none"
-                            placeholder="Describe your challenges"
+                            className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none resize-none h-32"
+                            placeholder="Please describe the primary obstacles preventing your business from reaching its next milestone..."
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="services" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">What services are you looking for?*</Label>
+                          <Label htmlFor="services" className="text-[#e8dcc8]/60 text-xs tracking-wider uppercase">Strategic Services Required*</Label>
                           <Input
                             id="services"
                             value={formData.servicesLookingFor || ''}
                             onChange={(e) => setFormData({ ...formData, servicesLookingFor: e.target.value })}
                             required
                             className="bg-transparent border-[#c9a86c]/20 text-[#f5f0e8] placeholder:text-[#e8dcc8]/30 focus:border-[#c9a86c] rounded-none h-12"
-                            placeholder="e.g. Digital Marketing, Franchise"
+                            placeholder="e.g. Business Strategy, Digital Transformation, Luxury Branding, or Market Expansion"
                           />
                         </div>
 
@@ -3528,12 +3353,11 @@ export default function App() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-[#0a0908]" style={{ cursor: 'none' }}>
+    <main className="min-h-screen bg-[#0a0908]">
       {/* Global UX Overlays */}
-      <CustomCursor muted={cursorMuted} />
       <ScrollProgressBar />
       <ParticleCanvas />
-      <BackgroundMusic cursorMuted={cursorMuted} setCursorMuted={setCursorMuted} />
+      <BackgroundMusic />
       <WhatsAppButton />
       <MobileStickyCTA />
 
