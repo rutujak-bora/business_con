@@ -1,11 +1,11 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'House of Parise Reed',
+  title: 'House of Parise',
   description: 'Transforming businesses with strategic consulting, digital transformation, and growth strategies. Expert guidance for startups and enterprises.',
   keywords: 'business consultant, strategy, digital transformation, startup consulting, growth strategy',
   openGraph: {
-    title: 'House of Parise Reed',
+    title: 'House of Parise',
     description: 'Transforming businesses with strategy, innovation & growth',
     type: 'website',
   },

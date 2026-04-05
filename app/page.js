@@ -155,7 +155,6 @@ function BackgroundMusic() {
                 direction: 'rtl',
                 width: '4px',
                 height: '70px',
-                cursor: 'none',
                 accentColor: '#c9a86c',
               }}
             />
@@ -177,7 +176,6 @@ function BackgroundMusic() {
           onClick={togglePlay}
           onMouseEnter={() => setShowVolume(true)}
           onMouseLeave={() => setShowVolume(false)}
-          style={{ cursor: 'none' }}
           title={playing ? 'Pause music' : 'Play ambient music'}
           className={`relative w-9 h-9 md:w-11 md:h-11 flex flex-col items-center justify-center border transition-all duration-500 backdrop-blur-sm ${playing
             ? 'border-[#c9a86c]/60 bg-[#c9a86c]/10 text-[#c9a86c]'
@@ -1538,8 +1536,7 @@ function CaseStudiesSection() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[99999] flex items-center justify-center p-6 md:p-12 lg:p-24"
-            style={{ cursor: 'none' }}
-          >
+                      >
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -2110,9 +2107,9 @@ function StartupSection() {
 
   return (
     <section id="startup" className="py-24 md:py-32 relative overflow-hidden" ref={ref}>
-      <div className="absolute top-0 right-0 w-[40%] h-[1px] bg-gradient-to-l from-[#c9a86c]/20 to-transparent" />
+      <div className="absolute top-0 right-0 w-[40%] h-[1px] bg-gradient-to-l from-[#c9a86c]/20 to-transparent pointer-events-none" />
 
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -2479,9 +2476,9 @@ function InvestorSection() {
 
   return (
     <section id="investor" className="py-24 md:py-40 relative bg-[#0a0908]/50" ref={ref}>
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent pointer-events-none" />
 
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -2776,9 +2773,9 @@ function ContactSection() {
 
   return (
     <section id="contact" className="py-32 md:py-40 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-t from-[#c9a86c]/[0.03] via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-[#c9a86c]/[0.03] via-transparent to-transparent pointer-events-none"></div>
 
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 relative z-10">
         <motion.div
           ref={ref}
           initial="hidden"
