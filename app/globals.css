@@ -93,19 +93,6 @@ html {
   box-sizing: border-box;
 }
 
-@media (pointer: fine) {
-  body {
-    cursor: none;
-  }
-  
-  a, button, label {
-    cursor: none !important;
-  }
-  
-  input, textarea, select {
-    cursor: auto !important;
-  }
-}
 
 body {
   font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
