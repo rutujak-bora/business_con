@@ -164,7 +164,7 @@ function CustomCursor({ muted }) {
       // Event delegation for hover states
       const target = e.target
       const isInput = target.closest('input, textarea, select, [role="combobox"]')
-      
+
       if (isInput) {
         dot.style.opacity = '0'
         ring.style.opacity = '0'
@@ -221,128 +221,42 @@ function BackgroundMusic({ cursorMuted, setCursorMuted }) {
   const [volume, setVolume] = useState(0.18)
   const [showVolume, setShowVolume] = useState(false)
   const [initiated, setInitiated] = useState(false)
-  const ctxRef = useRef(null)
-  const masterRef = useRef(null)
-  const nodesRef = useRef([])
-  const schedulerRef = useRef(null)
-  const nextNoteRef = useRef(0)
-  const noteIndexRef = useRef(0)
-  const volRef = useRef(0.18)
-  const playingRef = useRef(false)
+  const audioRef = useRef(null)
 
-  // Keep volRef/playingRef in sync
-  useEffect(() => { volRef.current = volume }, [volume])
-  useEffect(() => { playingRef.current = playing }, [playing])
+  // Initialize and clean up Audio
+  useEffect(() => {
+    const audio = new Audio('/BackgroundMusic.mpeg')
+    audio.loop = true
+    audio.volume = volume
+    audioRef.current = audio
 
-  // D pentatonic scale — elegant, calming, luxury feel
-  const NOTES = [293.66, 329.63, 369.99, 415.3, 493.88, 587.33, 659.25, 739.99, 880]
-  // Chord pads in D
-  const PAD_FREQS = [73.42, 110, 146.83, 185, 220]
-
-  const getCtx = () => {
-    if (!ctxRef.current) {
-      ctxRef.current = new (window.AudioContext || window.webkitAudioContext)()
-      // Master gain
-      const master = ctxRef.current.createGain()
-      master.gain.setValueAtTime(0, ctxRef.current.currentTime)
-      master.connect(ctxRef.current.destination)
-      masterRef.current = master
-
-      // ── Ambient Pad (warm drone) ──
-      PAD_FREQS.forEach((freq, i) => {
-        const ctx = ctxRef.current
-        const osc = ctx.createOscillator()
-        const padGain = ctx.createGain()
-        const lfo = ctx.createOscillator()
-        const lfoGain = ctx.createGain()
-        osc.type = i === 0 ? 'triangle' : 'sine'
-        osc.frequency.value = freq
-        lfo.frequency.value = 0.08 + i * 0.03
-        lfoGain.gain.value = freq * 0.003
-        lfo.connect(lfoGain)
-        lfoGain.connect(osc.frequency)
-        padGain.gain.value = i === 0 ? 0.08 : 0.04 - i * 0.006
-        osc.connect(padGain)
-        padGain.connect(master)
-        lfo.start()
-        osc.start()
-        nodesRef.current.push(osc, lfo)
-      })
-
-      // Set initial time for scheduler
-      nextNoteRef.current = ctxRef.current.currentTime + 0.5
+    return () => {
+      audio.pause()
+      audio.src = ''
     }
-    return ctxRef.current
-  }
+  }, [])
 
-  // Play a single piano-like note
-  const scheduleNote = (ctx, freq, time) => {
-    const osc = ctx.createOscillator()
-    const envGain = ctx.createGain()
-    // Sine + a bit of triangle for warmth
-    osc.type = 'sine'
-    osc.frequency.value = freq
-    envGain.gain.setValueAtTime(0, time)
-    envGain.gain.linearRampToValueAtTime(0.12, time + 0.02)   // attack
-    envGain.gain.exponentialRampToValueAtTime(0.04, time + 0.4) // decay
-    envGain.gain.exponentialRampToValueAtTime(0.0001, time + 2.2) // release
-    osc.connect(envGain)
-    envGain.connect(masterRef.current)
-    osc.start(time)
-    osc.stop(time + 2.2)
-  }
-
-  // Melody patterns — arpeggiated slowly
-  const PATTERNS = [
-    [0, 2, 4, 6, 4, 2],
-    [1, 3, 5, 7, 5, 3],
-    [0, 4, 6, 8, 6, 4],
-    [2, 4, 6, 4, 2, 0],
-  ]
-  const patRef = useRef(0)
-  const patStepRef = useRef(0)
-
-  const scheduler = () => {
-    if (!playingRef.current) return
-    const ctx = ctxRef.current
-    if (!ctx) return
-    const lookahead = 0.12      // seconds ahead to schedule
-    const scheduleAhead = 0.25
-
-    while (nextNoteRef.current < ctx.currentTime + scheduleAhead) {
-      const pat = PATTERNS[patRef.current % PATTERNS.length]
-      const noteIdx = pat[patStepRef.current % pat.length]
-      scheduleNote(ctx, NOTES[noteIdx], nextNoteRef.current)
-      patStepRef.current++
-      if (patStepRef.current >= pat.length) {
-        patStepRef.current = 0
-        patRef.current++
-      }
-      nextNoteRef.current += 1.6   // interval between notes (1.6s)
+  // Sync volume changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume
     }
-    schedulerRef.current = setTimeout(scheduler, lookahead * 1000)
-  }
+  }, [volume])
 
   const startMusic = () => {
-    const ctx = getCtx()
-    if (ctx.state === 'suspended') ctx.resume()
-    masterRef.current.gain.cancelScheduledValues(ctx.currentTime)
-    masterRef.current.gain.linearRampToValueAtTime(volRef.current, ctx.currentTime + 1.5)
-    setPlaying(true)
-    playingRef.current = true
-    nextNoteRef.current = ctx.currentTime + 0.3
-    scheduler()
+    if (audioRef.current) {
+      audioRef.current.play().catch(err => {
+        console.warn("Autoplay prevented by browser context:", err)
+      })
+      setPlaying(true)
+    }
   }
 
   const stopMusic = () => {
-    clearTimeout(schedulerRef.current)
-    const ctx = ctxRef.current
-    if (ctx && masterRef.current) {
-      masterRef.current.gain.cancelScheduledValues(ctx.currentTime)
-      masterRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.2)
+    if (audioRef.current) {
+      audioRef.current.pause()
+      setPlaying(false)
     }
-    setPlaying(false)
-    playingRef.current = false
   }
 
   const togglePlay = () => {
@@ -356,32 +270,28 @@ function BackgroundMusic({ cursorMuted, setCursorMuted }) {
     }
   }
 
-  // Volume change handler
+  // Handle first interaction auto-play
   useEffect(() => {
-    if (ctxRef.current && masterRef.current && playing) {
-      masterRef.current.gain.linearRampToValueAtTime(volume, ctxRef.current.currentTime + 0.3)
-    }
-  }, [volume])
-
-  // Auto-start on first interaction with page
-  useEffect(() => {
-    const tryAutoStart = () => {
+    const handleFirstInteraction = () => {
       if (!initiated) {
         setInitiated(true)
-        // Small delay to feel natural
         setTimeout(startMusic, 800)
       }
-      window.removeEventListener('click', tryAutoStart)
-      window.removeEventListener('keydown', tryAutoStart)
+      window.removeEventListener('click', handleFirstInteraction)
+      window.removeEventListener('keydown', handleFirstInteraction)
+      window.removeEventListener('touchstart', handleFirstInteraction)
     }
-    window.addEventListener('click', tryAutoStart)
-    window.addEventListener('keydown', tryAutoStart)
+    
+    window.addEventListener('click', handleFirstInteraction)
+    window.addEventListener('keydown', handleFirstInteraction)
+    window.addEventListener('touchstart', handleFirstInteraction)
+    
     return () => {
-      window.removeEventListener('click', tryAutoStart)
-      window.removeEventListener('keydown', tryAutoStart)
-      clearTimeout(schedulerRef.current)
+      window.removeEventListener('click', handleFirstInteraction)
+      window.removeEventListener('keydown', handleFirstInteraction)
+      window.removeEventListener('touchstart', handleFirstInteraction)
     }
-  }, [])
+  }, [initiated])
 
   return (
     <div className="fixed bottom-[90px] md:bottom-10 left-6 z-[99985] flex flex-row items-end gap-2 md:gap-3">
@@ -634,7 +544,7 @@ function FounderSection() {
           >
             <div className="relative aspect-[3/4] overflow-hidden max-w-md">
               <img
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=600"
+                src="/images/image3.png"
                 alt="Founder of House of Persis"
                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
               />
@@ -768,12 +678,12 @@ function InstagramSection() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-80px' })
   const posts = [
-    { img: 'https://images.unsplash.com/photo-1556155092-490a1ba16284?auto=format&fit=crop&q=80&w=400', likes: '284' },
-    { img: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=400', likes: '431' },
-    { img: 'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&q=80&w=400', likes: '192' },
-    { img: 'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&q=80&w=400', likes: '378' },
-    { img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=400', likes: '521' },
-    { img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400', likes: '267' },
+    { img: '/images/image6.png', likes: '284' },
+    { img: '/images/image7.png', likes: '431' },
+    { img: '/images/image1.png', likes: '192' },
+    { img: '/images/image2.png', likes: '378' },
+    { img: '/images/image4.png', likes: '521' },
+    { img: '/images/image5.png', likes: '267' },
   ]
   return (
     <section className="py-24 relative" ref={ref}>
@@ -1081,7 +991,9 @@ function Navigation() {
     { name: 'Services', href: '#services' },
     { name: 'Legacy', href: '#cases' },
     { name: 'Process', href: '#process' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Contact', href: '#contact' },
+    { name: 'Startup', href: '#startup' },
+    { name: 'Investor', href: '#investor' }
   ]
 
   return (
@@ -1120,7 +1032,7 @@ function Navigation() {
             onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
             className="bg-transparent border border-[#c9a86c]/40 text-[#c9a86c] hover:bg-[#c9a86c]/10 hover:border-[#c9a86c] rounded-none px-6 py-5 text-xs tracking-[0.1em] uppercase transition-all duration-300"
           >
-            Book Free Consultation
+            Book free consultation
           </Button>
         </div>
 
@@ -1153,8 +1065,11 @@ function Navigation() {
                   {link.name}
                 </a>
               ))}
-              <Button className="bg-[#c9a86c]/10 border border-[#c9a86c]/40 text-[#c9a86c] hover:bg-[#c9a86c]/20 rounded-none mt-2">
-                Book Consultation
+              <Button
+                onClick={() => { setIsOpen(false); document.getElementById('contact').scrollIntoView({ behavior: 'smooth' }) }}
+                className="bg-[#c9a86c]/10 border border-[#c9a86c]/40 text-[#c9a86c] hover:bg-[#c9a86c]/20 rounded-none mt-2 text-xs tracking-[0.1em] uppercase"
+              >
+                Book free consultation
               </Button>
             </div>
           </motion.div>
@@ -1262,7 +1177,7 @@ function HeroSection() {
               size="lg"
               className="bg-[#c9a86c] hover:bg-[#b8956d] text-[#0a0908] rounded-none px-10 py-7 text-xs tracking-[0.15em] uppercase font-medium group"
             >
-              Book a Free consultation
+              Book free consultation
               <ArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" size={16} />
             </Button>
           </motion.div>
@@ -1321,7 +1236,7 @@ function AboutSection() {
             <TiltCard>
               <div className="relative aspect-[4/5] overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 group">
                 <img
-                  src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800"
+                  src="/images/image1.png"
                   alt="House of Persis Consultant"
                   className="w-full h-full object-cover"
                 />
@@ -1344,7 +1259,7 @@ function AboutSection() {
             viewport={{ once: true }}
             transition={{ duration: 1 }}
           >
-            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block font-bold">What we do at house of persis?</span>
+            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block font-bold">What we do at House of Persis?</span>
             <h2 className="text-4xl md:text-5xl text-[#f5f0e8] mb-8 leading-tight font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
               Closing the gap between
               <span className="block text-[#c9a86c]/80 italic">Ambition & Roadmap</span>
@@ -1372,11 +1287,12 @@ function AboutSection() {
             transition={{ duration: 1 }}
             className="order-2 lg:order-1"
           >
-            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block font-bold">Why choose house of persis?</span>
-            <p className="text-[#e8dcc8]/60 text-lg mb-6 leading-relaxed font-bold">
-              Because good advice is common. A growth partner is rare.
-            </p>
-            <p className="text-[#e8dcc8]/50 mb-10 leading-relaxed">
+            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block font-bold">Why choose House of Persis?</span>
+            <h2 className="text-4xl md:text-5xl text-[#f5f0e8] mb-8 leading-tight font-light transition-all" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+              Because good advice is common.
+              <span className="block text-[#c9a86c]/80 italic">A growth partner is rare.</span>
+            </h2>
+            <p className="text-[#e8dcc8]/50 mb-10 leading-relaxed font-light">
               In a world full of consultants who hand you a report and walk away, House of Persis is different.
               We stay. We strategise, implement, refine, and grow - with you, not just for you.
               We work with you from end to end. From day one of your business to the day it runs without you.
@@ -1402,7 +1318,7 @@ function AboutSection() {
             <TiltCard>
               <div className="relative aspect-[3/2] overflow-hidden grayscale brightness-75 hover:grayscale-0 hover:brightness-100 transition-all duration-1000 group">
                 <img
-                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
+                  src="/images/image2.png"
                   alt="Premium Strategy Meeting"
                   className="w-full h-full object-cover"
                 />
@@ -2235,6 +2151,679 @@ function InsightsSection() {
   )
 }
 
+// ─── Startup Section ───
+function StartupSection() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-100px' })
+  const [showForm, setShowForm] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [otpStep, setOtpStep] = useState(false)
+  const [otpValue, setOtpValue] = useState('')
+  const [verifyingOtp, setVerifyingOtp] = useState(false)
+  const [otpError, setOtpError] = useState('')
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    startupName: '',
+    startupDescription: '',
+    websiteLink: '',
+    helpNeeded: [] // Marketing, Investor, Consulting
+  })
+
+  const toggleHelp = (type) => {
+    setFormData(prev => ({
+      ...prev,
+      helpNeeded: prev.helpNeeded.includes(type)
+        ? prev.helpNeeded.filter(t => t !== type)
+        : [...prev.helpNeeded, type]
+    }))
+  }
+
+  const handleSendOtp = async () => {
+    if (!formData.phone || formData.phone.length < 10) {
+      alert("Please enter a valid phone number")
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone })
+      })
+      if (response.ok) {
+        setOtpStep(true)
+        setOtpError('')
+      } else {
+        const err = await response.json()
+        alert(err.error || "Failed to send OTP")
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault()
+
+    if (!otpStep) {
+      await handleSendOtp()
+      return
+    }
+
+    if (otpValue.length < 6) {
+      setOtpError("Please enter the 6-digit OTP")
+      return
+    }
+
+    setVerifyingOtp(true)
+    try {
+      // 1. Verify OTP
+      const otpRes = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone, otp: otpValue })
+      })
+
+      if (!otpRes.ok) {
+        const err = await otpRes.json()
+        setOtpError(err.error || "Invalid OTP")
+        setVerifyingOtp(false)
+        return
+      }
+
+      // 2. Submit Form
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, type: 'startup' })
+      })
+
+      if (response.ok) {
+        setSubmitted(true)
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          startupName: '',
+          startupDescription: '',
+          websiteLink: '',
+          helpNeeded: []
+        })
+        setOtpStep(false)
+        setOtpValue('')
+      } else {
+        alert("Something went wrong. Please try again.")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Failed to connect. Please check your connection.")
+    } finally {
+      setVerifyingOtp(false)
+    }
+  }
+
+  const highlights = [
+    {
+      title: "We Help You Grow",
+      text: "Scaling a startup isn't just about moving fast - it's about moving smart. We work alongside you at every stage, helping you build a business that's not just fundable, but sustainable. From early traction to market expansion, we're with you for the long run."
+    },
+    {
+      title: "We Close the Gaps in Your Strategy",
+      text: "Blind spots can sink even the best ideas. Our experts sit down with you, study your business inside and out, and identify exactly what's holding you back — before it becomes a problem. Because a strong strategy isn't a luxury for startups. It's a lifeline."
+    },
+    {
+      title: "We Connect You With Investors Who Bring More Than Money",
+      text: "Funding is just the beginning. We connect you with investors who roll up their sleeves — people who bring networks, expertise, and real-world experience to your table. Investors who don't just write cheques, but open doors, challenge your thinking, and help you grow faster than you ever could alone."
+    }
+  ]
+
+  return (
+    <section id="startup" className="py-24 md:py-32 relative overflow-hidden" ref={ref}>
+      <div className="absolute top-0 right-0 w-[40%] h-[1px] bg-gradient-to-l from-[#c9a86c]/20 to-transparent" />
+
+      <div className="container mx-auto px-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-20"
+          >
+            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-4 block">Startup Partner</span>
+            <h2 className="text-4xl md:text-6xl text-[#f5f0e8] mb-8 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+              We Don't Just Support <span className="italic text-[#c9a86c]">Startups</span>.<br />
+              We Build Them <span className="italic">With You</span>.
+            </h2>
+            <p className="text-[#e8dcc8]/60 text-lg leading-relaxed font-light">
+              At House of Persis, we know that building a startup is one of the boldest things a person can do.
+              And we believe every bold idea deserves more than just capital - it deserves the right guidance,
+              the right strategy, and the right people in your corner.
+            </p>
+          </motion.div>
+
+          <div className="grid gap-12 mb-20">
+            {highlights.map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.8, delay: i * 0.2 }}
+                className="group relative p-8 border border-[#c9a86c]/10 hover:border-[#c9a86c]/30 transition-all duration-500 glass-card"
+              >
+                <div className="flex gap-6">
+                  <div className="w-12 h-12 flex-shrink-0 border border-[#c9a86c]/20 flex items-center justify-center text-[#c9a86c] text-sm group-hover:bg-[#c9a86c]/10 transition-colors">
+                    0{i + 1}
+                  </div>
+                  <div>
+                    <h3 className="text-xl text-[#f5f0e8] mb-4 font-light tracking-wide uppercase">{item.title}</h3>
+                    <p className="text-[#e8dcc8]/50 leading-relaxed font-light">{item.text}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={isInView ? { opacity: 1, scale: 1 } : {}}
+              className="text-center p-12 border border-[#c9a86c]/15 bg-[#c9a86c]/5"
+            >
+              <h3 className="text-3xl text-[#f5f0e8] mb-6 font-light italic" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                Let's build something great, together.
+              </h3>
+              <Button
+                onClick={() => setShowForm(true)}
+                className="bg-[#c9a86c] text-[#0a0908] hover:bg-[#b8956d] rounded-none px-12 py-7 text-xs tracking-widest uppercase font-medium"
+              >
+                Start the Conversation
+              </Button>
+            </motion.div>
+
+            <div className="relative group overflow-hidden">
+              <img 
+                src="/images/image4.png" 
+                alt="Startup Support"
+                className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-1000"
+              />
+              <div className="absolute inset-0 border border-[#c9a86c]/20 m-4" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Startup Form Modal */}
+      <AnimatePresence>
+        {showForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 md:p-6"
+          >
+            <div className="absolute inset-0 bg-[#0a0908]/95 backdrop-blur-xl" onClick={() => setShowForm(false)} />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto glass-premium border border-[#c9a86c]/20 p-8 md:p-12 scrollbar-none"
+            >
+              <button
+                onClick={() => setShowForm(false)}
+                className="absolute top-6 right-6 text-[#e8dcc8]/30 hover:text-[#c9a86c] transition-colors"
+              >
+                <X size={24} />
+              </button>
+
+              {submitted ? (
+                <div className="text-center py-20">
+                  <div className="w-16 h-16 border border-[#c9a86c] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle className="text-[#c9a86c]" size={32} />
+                  </div>
+                  <h3 className="text-3xl text-[#f5f0e8] mb-4 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Application Received</h3>
+                  <p className="text-[#e8dcc8]/60 font-light mb-8">We'll review your startup and get back to you within 24 hours.</p>
+                  <Button
+                    onClick={() => { setShowForm(false); setSubmitted(false); }}
+                    className="bg-transparent border border-[#c9a86c]/30 text-[#c9a86c] hover:bg-[#c9a86c]/10 rounded-none px-8 py-5 text-xs tracking-widest uppercase"
+                  >
+                    Close
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-10 text-center">
+                    <h3 className="text-3xl text-[#f5f0e8] mb-3 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Start the Conversation</h3>
+                    <p className="text-[#e8dcc8]/40 text-sm font-light">Tell us about your venture and how we can leap forward together.</p>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Full Name</Label>
+                        <Input
+                          placeholder="E.g. Alexander Persis"
+                          className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0"
+                          value={formData.fullName}
+                          onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Email Address</Label>
+                        <Input
+                          type="email"
+                          placeholder="alex@startup.com"
+                          className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0"
+                          value={formData.email}
+                          onChange={e => setFormData({ ...formData, email: e.target.value })}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Phone Number</Label>
+                      <div className="flex gap-4">
+                        <Input
+                          placeholder="+91 00000 00000"
+                          className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0"
+                          value={formData.phone}
+                          onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                          disabled={otpStep}
+                          required
+                        />
+                        {!otpStep && (
+                          <Button
+                            type="button"
+                            onClick={handleSendOtp}
+                            disabled={isSubmitting || !formData.phone}
+                            className="bg-[#c9a86c]/10 border border-[#c9a86c]/40 text-[#c9a86c] hover:bg-[#c9a86c]/20 rounded-none px-6 text-[10px] tracking-widest uppercase flex-shrink-0"
+                          >
+                            {isSubmitting ? 'Sending...' : 'Get OTP'}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {otpStep && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        className="space-y-4 pt-2"
+                      >
+                        <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c] flex items-center gap-2">
+                          <Lock size={10} /> Enter 6-Digit OTP
+                        </Label>
+                        <InputOTP
+                          maxLength={6}
+                          value={otpValue}
+                          onChange={(val) => setOtpValue(val)}
+                        >
+                          <InputOTPGroup className="gap-2">
+                            {[0, 1, 2, 3, 4, 5].map((idx) => (
+                              <InputOTPSlot
+                                key={idx}
+                                index={idx}
+                                className="w-full h-12 border-[#c9a86c]/30 text-[#f5f0e8] rounded-none bg-[#c9a86c]/5"
+                              />
+                            ))}
+                          </InputOTPGroup>
+                        </InputOTP>
+                        {otpError && <p className="text-red-400 text-[10px] uppercase tracking-widest">{otpError}</p>}
+                        <button
+                          type="button"
+                          onClick={() => setOtpStep(false)}
+                          className="text-[10px] uppercase tracking-[0.2em] text-[#c9a86c]/40 hover:text-[#c9a86c] transition-colors"
+                        >
+                          Change Phone Number
+                        </button>
+                      </motion.div>
+                    )}
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Startup Name</Label>
+                        <Input
+                          placeholder="The Next Unicorn"
+                          className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0"
+                          value={formData.startupName}
+                          onChange={e => setFormData({ ...formData, startupName: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Website Link</Label>
+                        <Input
+                          placeholder="https://..."
+                          className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0"
+                          value={formData.websiteLink}
+                          onChange={e => setFormData({ ...formData, websiteLink: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">What is your startup?</Label>
+                      <Textarea
+                        placeholder="Tell us about your mission, product, and progress..."
+                        className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0 h-24 resize-none"
+                        value={formData.startupDescription}
+                        onChange={e => setFormData({ ...formData, startupDescription: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="space-y-4">
+                      <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">What help are you looking for?</Label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {['Marketing', 'Investor', 'Consulting'].map((type) => (
+                          <button
+                            key={type}
+                            type="button"
+                            onClick={() => toggleHelp(type)}
+                            className={`p-3 text-[10px] tracking-widest uppercase transition-all border duration-300 ${formData.helpNeeded.includes(type)
+                                ? 'bg-[#c9a86c] text-[#0a0908] border-[#c9a86c]'
+                                : 'bg-transparent text-[#e8dcc8]/40 border-[#c9a86c]/20 hover:border-[#c9a86c]/40'
+                              }`}
+                          >
+                            {type}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={verifyingOtp || (otpStep && otpValue.length < 6)}
+                      className="w-full bg-[#c9a86c] text-[#0a0908] hover:bg-[#b8956d] rounded-none py-8 text-xs tracking-[0.2em] uppercase font-bold mt-4"
+                    >
+                      {verifyingOtp ? 'Verifying...' : otpStep ? 'Submit Form' : 'Send Application'}
+                    </Button>
+                  </form>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  )
+}
+
+// ─── Investor Section ───
+function InvestorSection() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-100px' })
+  const [showForm, setShowForm] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [otpStep, setOtpStep] = useState(false)
+  const [otpValue, setOtpValue] = useState('')
+  const [verifyingOtp, setVerifyingOtp] = useState(false)
+  const [otpError, setOtpError] = useState('')
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+  })
+
+  const handleSendOtp = async () => {
+    if (!formData.phone || formData.phone.length < 10) {
+      alert("Please enter a valid phone number")
+      return
+    }
+    setIsSubmitting(true)
+    try {
+      const response = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone })
+      })
+      if (response.ok) {
+        setOtpStep(true)
+        setOtpError('')
+      } else {
+        const err = await response.json()
+        alert(err.error || "Failed to send OTP")
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault()
+    if (!otpStep) {
+      await handleSendOtp()
+      return
+    }
+    if (otpValue.length < 6) {
+      setOtpError("Please enter the 6-digit OTP")
+      return
+    }
+    setVerifyingOtp(true)
+    try {
+      const otpRes = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone, otp: otpValue })
+      })
+      if (!otpRes.ok) {
+        const err = await otpRes.json()
+        setOtpError(err.error || "Invalid OTP")
+        setVerifyingOtp(false)
+        return
+      }
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, type: 'investor' })
+      })
+      if (response.ok) {
+        setSubmitted(true)
+        setFormData({ fullName: '', email: '', phone: '' })
+        setOtpStep(false)
+        setOtpValue('')
+      } else {
+        alert("Something went wrong.")
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setVerifyingOtp(false)
+    }
+  }
+
+  const investorTypes = [
+    { t: 'Individual (Retail)', d: 'Everyday people investing personal savings. No fancy credentials required - just the will to start.' },
+    { t: 'Institutional', d: 'Banks, insurance companies, and pension funds that move markets with their capital.' },
+    { t: 'Angel Investors', d: 'High-net-worth individuals backing startups at their earliest stages for high risk/reward.' },
+    { t: 'Venture Capitalists', d: 'Firms investing in high-growth startups for equity, bringing networks and mentorship.' },
+    { t: 'Private Equity', d: 'Acquiring stakes in private companies to restructure, grow, and exit at a profit.' },
+    { t: 'Hedge Funds', d: 'Sophisticated players using complex strategies to generate returns in any market.' },
+    { t: 'Real Estate', d: 'Building wealth through property appreciation, rental income, and REITs.' },
+    { t: 'Impact Investors', d: 'Investing with purpose to seek measurable social or environmental impact.' }
+  ]
+
+  return (
+    <section id="investor" className="py-24 md:py-40 relative bg-[#0a0908]/50" ref={ref}>
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#c9a86c]/20 to-transparent" />
+
+      <div className="container mx-auto px-6">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            className="mb-24"
+          >
+            <span className="text-[#c9a86c] text-xs tracking-[0.3em] uppercase mb-6 block">Wealth Architecture</span>
+            <h2 className="text-4xl md:text-7xl text-[#f5f0e8] mb-10 font-light leading-tight" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+              What Is an <span className="italic text-[#c9a86c]">Investor</span> —<br />
+              And How You Could Be One?
+            </h2>
+            <div className="grid md:grid-cols-2 gap-12 text-[#e8dcc8]/60 font-light text-lg leading-relaxed">
+              <p>
+                Every great company started with someone who believed in it before the world did.
+                That someone? An investor. An investor is anyone who commits money, time, or resources
+                into an asset with the expectation of earning a return.
+              </p>
+              <p>
+                Whether you have $100 or $100 million, investing is how wealth is built, businesses
+                are born, and economies grow. The first step is understanding who investors are
+                and where you fit in.
+              </p>
+            </div>
+          </motion.div>
+
+          <div className="mb-32">
+            <h3 className="text-2xl text-[#f5f0e8] mb-12 font-light tracking-[0.2em] uppercase text-center">The Investor Landscape</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-[#c9a86c]/10 border border-[#c9a86c]/10">
+              {investorTypes.map((type, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 1 } : {}}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-[#0a0908] p-8 hover:bg-[#c9a86c]/5 transition-colors duration-500 flex flex-col h-full"
+                >
+                  <h4 className="text-[#c9a86c] text-xs tracking-widest uppercase mb-4">{type.t}</h4>
+                  <p className="text-[#e8dcc8]/40 text-sm font-light leading-relaxed">{type.d}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+            >
+              <h3 className="text-3xl text-[#f5f0e8] mb-6 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Why It Matters</h3>
+              <p className="text-[#e8dcc8]/50 leading-relaxed font-light mb-8">
+                The difference between those who build wealth and those who don't often comes down to one decision:
+                choosing to invest. Every investor type has a different risk appetite, time horizon, and strategy —
+                but they all share one mindset: money should grow, not sit still.
+              </p>
+              <div className="p-8 border-l border-[#c9a86c]/30 bg-[#c9a86c]/5">
+                <h4 className="text-[#f5f0e8] mb-4 font-light italic text-xl" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                  Ready to Think Like an Investor?
+                </h4>
+                <p className="text-[#e8dcc8]/40 text-sm font-light mb-8">
+                  Whether you're exploring your first stock or evaluating your next portfolio move,
+                  understanding the investor landscape is your foundation.
+                </p>
+                <Button
+                  onClick={() => setShowForm(true)}
+                  className="bg-[#c9a86c] text-[#0a0908] hover:bg-[#b8956d] rounded-none px-10 py-6 text-xs tracking-widest uppercase font-medium"
+                >
+                  Get Started
+                </Button>
+              </div>
+            </motion.div>
+
+            <div className="relative group overflow-hidden">
+              <img
+                src="/images/image5.png"
+                alt="Investor Landscape"
+                className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-1000"
+              />
+              <div className="absolute inset-0 border border-[#c9a86c]/20 m-4" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Investor Form Modal */}
+      <AnimatePresence>
+        {showForm && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+          >
+            <div className="absolute inset-0 bg-[#0a0908]/95 backdrop-blur-xl" onClick={() => setShowForm(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+              className="relative w-full max-w-lg glass-premium border border-[#c9a86c]/20 p-8 md:p-12"
+            >
+              <button onClick={() => setShowForm(false)} className="absolute top-6 right-6 text-[#e8dcc8]/30 hover:text-[#c9a86c]"><X size={24} /></button>
+
+              {submitted ? (
+                <div className="text-center py-12">
+                  <CheckCircle className="text-[#c9a86c] mx-auto mb-6" size={48} />
+                  <h3 className="text-3xl text-[#f5f0e8] mb-4 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Journey Started</h3>
+                  <p className="text-[#e8dcc8]/60 font-light mb-8">Our investment strategists will reach out to schedule your briefing.</p>
+                  <Button onClick={() => setShowForm(false)} className="bg-[#c9a86c] text-[#0a0908] rounded-none px-8 py-4 uppercase text-xs tracking-widest font-bold">Close</Button>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-10 text-center">
+                    <h3 className="text-3xl text-[#f5f0e8] mb-2 font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Get Started</h3>
+                    <p className="text-[#e8dcc8]/40 text-xs uppercase tracking-widest">Begin your architectural wealth journey</p>
+                  </div>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Full Name</Label>
+                      <Input
+                        placeholder="Alexander Persis"
+                        className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0"
+                        value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Email Address</Label>
+                      <Input
+                        type="email" placeholder="alex@investor.com"
+                        className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0"
+                        value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c]/60">Phone Number</Label>
+                      <div className="flex gap-4">
+                        <Input
+                          placeholder="+91 00000 00000"
+                          className="bg-transparent border-[#c9a86c]/20 rounded-none text-[#f5f0e8] placeholder:text-[#e8dcc8]/20 focus:border-[#c9a86c]/60 focus:ring-0"
+                          value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} disabled={otpStep} required
+                        />
+                        {!otpStep && (
+                          <Button type="button" onClick={handleSendOtp} disabled={isSubmitting || !formData.phone} className="bg-[#c9a86c]/10 border border-[#c9a86c]/40 text-[#c9a86c] hover:bg-[#c9a86c]/20 rounded-none px-6 text-[10px] tracking-widest uppercase shrink-0">
+                            {isSubmitting ? '...' : 'OTP'}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    {otpStep && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="space-y-4 pt-2">
+                        <Label className="text-[10px] uppercase tracking-widest text-[#c9a86c] flex items-center gap-2"><Lock size={10} /> Verification Code</Label>
+                        <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
+                          <InputOTPGroup className="gap-2">
+                            {[0, 1, 2, 3, 4, 5].map((idx) => <InputOTPSlot key={idx} index={idx} className="w-full h-12 border-[#c9a86c]/30 text-[#f5f0e8] rounded-none bg-[#c9a86c]/5" />)}
+                          </InputOTPGroup>
+                        </InputOTP>
+                        {otpError && <p className="text-red-400 text-[10px] uppercase tracking-widest">{otpError}</p>}
+                      </motion.div>
+                    )}
+                    <Button type="submit" disabled={verifyingOtp || (otpStep && otpValue.length < 6)} className="w-full bg-[#c9a86c] text-[#0a0908] hover:bg-[#b8956d] rounded-none py-8 text-xs tracking-[0.2em] uppercase font-bold mt-4">
+                      {verifyingOtp ? 'Verifying...' : otpStep ? 'Initialize Journey' : 'Get Started'}
+                    </Button>
+                  </form>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  )
+}
+
 // Contact Section
 function ContactSection() {
   const ref = useRef(null)
@@ -2854,7 +3443,7 @@ function Footer() {
           <div>
             <h4 className="text-[#f5f0e8] mb-6 text-xs tracking-[0.2em] uppercase">Navigation</h4>
             <ul className="space-y-4">
-              {['About', 'Services', 'Legacy', 'Process', 'Contact'].map((link) => (
+              {['About', 'Services', 'Legacy', 'Process', 'Contact', 'Startup', 'Investor'].map((link) => (
                 <li key={link}>
                   <a href={`#${link === 'Legacy' ? 'cases' : link.toLowerCase()}`} className="text-[#e8dcc8]/50 hover:text-[#c9a86c] transition-colors font-light text-sm">
                     {link}
@@ -2971,6 +3560,8 @@ export default function App() {
         <TestimonialsSection />
         <FAQSection />
         <InsightsSection />
+        <StartupSection />
+        <InvestorSection />
         <InstagramSection />
         <ContactSection />
         <Footer />
